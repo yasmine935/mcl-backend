@@ -39,7 +39,8 @@ public class ReclamationSSE {
 
     @Column(columnDefinition = "TEXT")
     private String actionCorrective;
-
+    @Column(columnDefinition = "LONGTEXT")
+    private String photosJson;
     private String responsableAction;
     private String echeance;
     private Boolean informationDeclarant;

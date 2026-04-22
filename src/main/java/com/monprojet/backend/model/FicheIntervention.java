@@ -19,12 +19,22 @@ public class FicheIntervention {
     private LocalDate dateIntervention;
     private String heureDebut;
     private String heureFin;
+    private String intervenants;
+    private String nomClientSigne;
+    private String dateCompletion;
+    private String approuvePar;
+    private String dateApprobation;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String statut; // EN_COURS, COMPLETEE
+    @Column(columnDefinition = "LONGTEXT")
+    private String signatureTechnicien;
 
+    @Column(columnDefinition = "LONGTEXT")
+    private String signatureClient;
+
+    private String statut;
     private LocalDateTime dateCreation;
 
     @ManyToOne
@@ -35,7 +45,16 @@ public class FicheIntervention {
     @JoinColumn(name = "manager_id")
     private Utilisateur manager;
 
-    // Getters & Setters
+    @PrePersist
+    public void prePersist() {
+        if (this.dateCreation == null) this.dateCreation = LocalDateTime.now();
+        if (this.statut == null) this.statut = "EN_COURS";
+    }
+    // + getters/setters
+    public String getApprouvePar() { return approuvePar; }
+    public void setApprouvePar(String approuvePar) { this.approuvePar = approuvePar; }
+    public String getDateApprobation() { return dateApprobation; }
+    public void setDateApprobation(String dateApprobation) { this.dateApprobation = dateApprobation; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNumProjet() { return numProjet; }
@@ -52,8 +71,18 @@ public class FicheIntervention {
     public void setHeureDebut(String heureDebut) { this.heureDebut = heureDebut; }
     public String getHeureFin() { return heureFin; }
     public void setHeureFin(String heureFin) { this.heureFin = heureFin; }
+    public String getIntervenants() { return intervenants; }
+    public void setIntervenants(String intervenants) { this.intervenants = intervenants; }
+    public String getNomClientSigne() { return nomClientSigne; }
+    public void setNomClientSigne(String nomClientSigne) { this.nomClientSigne = nomClientSigne; }
+    public String getDateCompletion() { return dateCompletion; }
+    public void setDateCompletion(String dateCompletion) { this.dateCompletion = dateCompletion; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public String getSignatureTechnicien() { return signatureTechnicien; }
+    public void setSignatureTechnicien(String s) { this.signatureTechnicien = s; }
+    public String getSignatureClient() { return signatureClient; }
+    public void setSignatureClient(String s) { this.signatureClient = s; }
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
     public LocalDateTime getDateCreation() { return dateCreation; }

@@ -85,7 +85,7 @@ public class CongeController {
                 .mapToInt(c -> calculerJours(c.getDateDebut(), c.getDateFin()))
                 .sum();
 
-        int soldeAnnuelTotal = 30;
+        int soldeAnnuelTotal = 25;
         int soldeRTTTotal = 12;
 
         Map<String, Object> solde = new HashMap<>();
