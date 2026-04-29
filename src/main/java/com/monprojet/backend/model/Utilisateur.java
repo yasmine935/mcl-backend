@@ -10,7 +10,7 @@ public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private boolean premierConnexion = false;
     private String nom;
     private String prenom;
     private String email;
@@ -47,4 +47,6 @@ public class Utilisateur {
     public void setRole(String role) { this.role = role; }
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
+    public boolean isPremierConnexion() { return premierConnexion; }
+    public void setPremierConnexion(boolean premierConnexion) { this.premierConnexion = premierConnexion; }
 }

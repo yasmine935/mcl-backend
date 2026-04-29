@@ -30,10 +30,10 @@ public class UtilisateurController {
 
     // POST créer un employé
     @PostMapping
-    public Utilisateur create(@RequestBody Utilisateur u) {
-        return repo.save(u);
+    public Utilisateur creer(@RequestBody Utilisateur utilisateur) {
+        utilisateur.setPremierConnexion(true);  // ← ajoute cette ligne
+        return repo.save(utilisateur);
     }
-
     // PUT modifier un employé
     @PutMapping("/{id}")
     public ResponseEntity<Utilisateur> update(@PathVariable Long id, @RequestBody Utilisateur u) {
