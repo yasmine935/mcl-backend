@@ -29,6 +29,12 @@ public class FicheIntervention {
     private String description;
 
     @Column(columnDefinition = "LONGTEXT")
+    private String taches;
+
+    @Column(columnDefinition = "TEXT")
+    private String materielsHorsStandard;
+
+    @Column(columnDefinition = "LONGTEXT")
     private String signatureTechnicien;
 
     @Column(columnDefinition = "LONGTEXT")
@@ -79,6 +85,10 @@ public class FicheIntervention {
     public void setDateCompletion(String dateCompletion) { this.dateCompletion = dateCompletion; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public String getTaches() { return taches; }
+    public void setTaches(String taches) { this.taches = taches; }
+    public String getMaterielsHorsStandard() { return materielsHorsStandard; }
+    public void setMaterielsHorsStandard(String m) { this.materielsHorsStandard = m; }
     public String getSignatureTechnicien() { return signatureTechnicien; }
     public void setSignatureTechnicien(String s) { this.signatureTechnicien = s; }
     public String getSignatureClient() { return signatureClient; }

@@ -45,6 +45,7 @@ public class FicheInterventionController {
             fiche.setContact(updated.getContact());
             fiche.setDateIntervention(updated.getDateIntervention());
             fiche.setDescription(updated.getDescription());
+            fiche.setTaches(updated.getTaches());
             fiche.setStatut(updated.getStatut());
             fiche.setHeureDebut(updated.getHeureDebut());
             fiche.setHeureFin(updated.getHeureFin());
@@ -77,6 +78,7 @@ public class FicheInterventionController {
             if (data.get("heureFin") != null) fiche.setHeureFin((String) data.get("heureFin"));
             if (data.get("intervenants") != null) fiche.setIntervenants((String) data.get("intervenants"));
             if (data.get("dateCompletion") != null) fiche.setDateCompletion((String) data.get("dateCompletion"));
+            if (data.get("materielsHorsStandard") != null) fiche.setMaterielsHorsStandard((String) data.get("materielsHorsStandard"));
             return ResponseEntity.ok(ficheRepository.save(fiche));
         }).orElse(ResponseEntity.notFound().build());
     }
