@@ -46,6 +46,7 @@ public class FicheInterventionController {
             fiche.setDateIntervention(updated.getDateIntervention());
             fiche.setDescription(updated.getDescription());
             fiche.setTaches(updated.getTaches());
+            fiche.setDocumentsImportes(updated.getDocumentsImportes());
             fiche.setStatut(updated.getStatut());
             fiche.setHeureDebut(updated.getHeureDebut());
             fiche.setHeureFin(updated.getHeureFin());
@@ -54,6 +55,14 @@ public class FicheInterventionController {
                 tech.setId(updated.getTechnicien().getId());
                 fiche.setTechnicien(tech);
             }
+            return ResponseEntity.ok(ficheRepository.save(fiche));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}/taches")
+    public ResponseEntity<FicheIntervention> saveTaches(@PathVariable Long id, @RequestBody Map<String, Object> data) {
+        return ficheRepository.findById(id).map(fiche -> {
+            if (data.get("taches") != null) fiche.setTaches((String) data.get("taches"));
             return ResponseEntity.ok(ficheRepository.save(fiche));
         }).orElse(ResponseEntity.notFound().build());
     }

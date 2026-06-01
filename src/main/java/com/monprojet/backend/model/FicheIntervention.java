@@ -35,6 +35,9 @@ public class FicheIntervention {
     private String materielsHorsStandard;
 
     @Column(columnDefinition = "LONGTEXT")
+    private String documentsImportes;
+
+    @Column(columnDefinition = "LONGTEXT")
     private String signatureTechnicien;
 
     @Column(columnDefinition = "LONGTEXT")
@@ -89,6 +92,8 @@ public class FicheIntervention {
     public void setTaches(String taches) { this.taches = taches; }
     public String getMaterielsHorsStandard() { return materielsHorsStandard; }
     public void setMaterielsHorsStandard(String m) { this.materielsHorsStandard = m; }
+    public String getDocumentsImportes() { return documentsImportes; }
+    public void setDocumentsImportes(String d) { this.documentsImportes = d; }
     public String getSignatureTechnicien() { return signatureTechnicien; }
     public void setSignatureTechnicien(String s) { this.signatureTechnicien = s; }
     public String getSignatureClient() { return signatureClient; }
