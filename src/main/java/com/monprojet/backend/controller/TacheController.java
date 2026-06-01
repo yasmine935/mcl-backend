@@ -61,7 +61,14 @@ public class TacheController {
             existing.setPriorite(tache.getPriorite());
             existing.setStatut(tache.getStatut());
             existing.setDateEcheance(tache.getDateEcheance());
-            existing.setUtilisateur(tache.getUtilisateur());
+            existing.setClient(tache.getClient());
+            existing.setClientFinal(tache.getClientFinal());
+            existing.setChiffreAffaire(tache.getChiffreAffaire());
+            existing.setNumDevis(tache.getNumDevis());
+            existing.setAssignes(tache.getAssignes());
+            existing.setEtapes(tache.getEtapes());
+            existing.setFichiers(tache.getFichiers());
+            if (tache.getUtilisateur() != null) existing.setUtilisateur(tache.getUtilisateur());
             return ResponseEntity.ok(tacheRepository.save(existing));
         }).orElse(ResponseEntity.notFound().build());
     }
