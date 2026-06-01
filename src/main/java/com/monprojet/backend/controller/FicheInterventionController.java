@@ -75,21 +75,31 @@ public class FicheInterventionController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    private String str(Map<String, Object> data, String key) {
+        Object val = data.get(key);
+        return val != null ? (String) val : null;
+    }
+
     // ✅ Technicien complète la fiche avec signatures
     @PutMapping("/{id}/completer")
     public ResponseEntity<FicheIntervention> completerFiche(@PathVariable Long id, @RequestBody Map<String, Object> data) {
         return ficheRepository.findById(id).map(fiche -> {
             fiche.setStatut("COMPLETEE");
-            if (data.get("signatureTechnicien") != null) fiche.setSignatureTechnicien((String) data.get("signatureTechnicien"));
-            if (data.get("signatureClient") != null) fiche.setSignatureClient((String) data.get("signatureClient"));
-            if (data.get("nomClientSigne") != null) fiche.setNomClientSigne((String) data.get("nomClientSigne"));
-            if (data.get("heureDebut") != null) fiche.setHeureDebut((String) data.get("heureDebut"));
-            if (data.get("heureFin") != null) fiche.setHeureFin((String) data.get("heureFin"));
-            if (data.get("intervenants") != null) fiche.setIntervenants((String) data.get("intervenants"));
-            if (data.get("dateCompletion") != null) fiche.setDateCompletion((String) data.get("dateCompletion"));
-            if (data.get("materielsHorsStandard") != null) fiche.setMaterielsHorsStandard((String) data.get("materielsHorsStandard"));
+            appliquerDonneesCompletion(fiche, data);
             return ResponseEntity.ok(ficheRepository.save(fiche));
         }).orElse(ResponseEntity.notFound().build());
+    }
+
+    private void appliquerDonneesCompletion(FicheIntervention fiche, Map<String, Object> data) {
+        if (str(data, "signatureTechnicien") != null) fiche.setSignatureTechnicien(str(data, "signatureTechnicien"));
+        if (str(data, "signatureClient") != null) fiche.setSignatureClient(str(data, "signatureClient"));
+        if (str(data, "nomClientSigne") != null) fiche.setNomClientSigne(str(data, "nomClientSigne"));
+        if (str(data, "heureDebut") != null) fiche.setHeureDebut(str(data, "heureDebut"));
+        if (str(data, "heureFin") != null) fiche.setHeureFin(str(data, "heureFin"));
+        if (str(data, "intervenants") != null) fiche.setIntervenants(str(data, "intervenants"));
+        if (str(data, "dateCompletion") != null) fiche.setDateCompletion(str(data, "dateCompletion"));
+        if (str(data, "materielsHorsStandard") != null) fiche.setMaterielsHorsStandard(str(data, "materielsHorsStandard"));
+        if (str(data, "photos") != null) fiche.setPhotos(str(data, "photos"));
     }
     @PutMapping("/{id}/valider")
     public ResponseEntity<FicheIntervention> validerFiche(@PathVariable Long id, @RequestBody Map<String, Object> data) {
