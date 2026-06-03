@@ -53,6 +53,13 @@ public class FicheIntervention {
     @JoinColumn(name = "technicien_id")
     private Utilisateur technicien;
 
+    // Liste de tous les techniciens assignés (IDs séparés par virgule : "1,2,3")
+    private String technicienIds;
+
+    // Noms affichables de tous les techniciens assignés (JSON)
+    @Column(columnDefinition = "TEXT")
+    private String technicienNoms;
+
     @ManyToOne
     @JoinColumn(name = "manager_id")
     private Utilisateur manager;
@@ -109,6 +116,10 @@ public class FicheIntervention {
     public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
     public Utilisateur getTechnicien() { return technicien; }
     public void setTechnicien(Utilisateur technicien) { this.technicien = technicien; }
+    public String getTechnicienIds() { return technicienIds; }
+    public void setTechnicienIds(String technicienIds) { this.technicienIds = technicienIds; }
+    public String getTechnicienNoms() { return technicienNoms; }
+    public void setTechnicienNoms(String technicienNoms) { this.technicienNoms = technicienNoms; }
     public Utilisateur getManager() { return manager; }
     public void setManager(Utilisateur manager) { this.manager = manager; }
 }

@@ -28,7 +28,7 @@ public class FicheInterventionController {
 
     @GetMapping("/technicien/{technicienId}")
     public List<FicheIntervention> getByTechnicien(@PathVariable Long technicienId) {
-        return ficheRepository.findByTechnicienId(technicienId);
+        return ficheRepository.findByTechnicienPrincipalOrMulti(technicienId);
     }
 
     @PostMapping
@@ -55,6 +55,8 @@ public class FicheInterventionController {
                 tech.setId(updated.getTechnicien().getId());
                 fiche.setTechnicien(tech);
             }
+            fiche.setTechnicienIds(updated.getTechnicienIds());
+            fiche.setTechnicienNoms(updated.getTechnicienNoms());
             return ResponseEntity.ok(ficheRepository.save(fiche));
         }).orElse(ResponseEntity.notFound().build());
     }
