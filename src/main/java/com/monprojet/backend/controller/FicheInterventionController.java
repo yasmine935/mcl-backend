@@ -28,7 +28,11 @@ public class FicheInterventionController {
 
     @GetMapping("/technicien/{technicienId}")
     public List<FicheIntervention> getByTechnicien(@PathVariable Long technicienId) {
-        return ficheRepository.findByTechnicienPrincipalOrMulti(technicienId);
+        try {
+            return ficheRepository.findByTechnicienPrincipalOrMulti(technicienId);
+        } catch (Exception e) {
+            return ficheRepository.findByTechnicienId(technicienId);
+        }
     }
 
     @PostMapping
