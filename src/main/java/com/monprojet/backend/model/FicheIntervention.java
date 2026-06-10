@@ -17,6 +17,7 @@ public class FicheIntervention {
     private String adresse;
     private String contact;
     private LocalDate dateIntervention;
+    private LocalDate dateFin;
     private String heureDebut;
     private String heureFin;
     private String intervenants;
@@ -86,6 +87,8 @@ public class FicheIntervention {
     public void setContact(String contact) { this.contact = contact; }
     public LocalDate getDateIntervention() { return dateIntervention; }
     public void setDateIntervention(LocalDate dateIntervention) { this.dateIntervention = dateIntervention; }
+    public LocalDate getDateFin() { return dateFin; }
+    public void setDateFin(LocalDate dateFin) { this.dateFin = dateFin; }
     public String getHeureDebut() { return heureDebut; }
     public void setHeureDebut(String heureDebut) { this.heureDebut = heureDebut; }
     public String getHeureFin() { return heureFin; }
