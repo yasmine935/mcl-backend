@@ -10,6 +10,6 @@ public interface FicheInterventionRepository extends JpaRepository<FicheInterven
     List<FicheIntervention> findByStatut(String statut);
 
     // Retourne toutes les fiches où le technicien est assigné (principal OU dans la liste multi)
-    @Query(value = "SELECT * FROM fiche_intervention WHERE technicien_id = :id OR FIND_IN_SET(:id, technicien_ids) > 0", nativeQuery = true)
+    @Query(value = "SELECT * FROM fiches_intervention WHERE technicien_id = :id OR FIND_IN_SET(:id, technicien_ids) > 0", nativeQuery = true)
     List<FicheIntervention> findByTechnicienPrincipalOrMulti(@Param("id") Long id);
 }
