@@ -39,6 +39,18 @@ public class CongeController {
         return congeRepository.save(conge);
     }
 
+    // PUT (modification de la demande par son auteur)
+    @PutMapping("/{id}")
+    public ResponseEntity<Conge> update(@PathVariable Long id, @RequestBody Conge congeModifie) {
+        return congeRepository.findById(id).map(conge -> {
+            conge.setDateDebut(congeModifie.getDateDebut());
+            conge.setDateFin(congeModifie.getDateFin());
+            conge.setType(congeModifie.getType());
+            conge.setMotif(congeModifie.getMotif());
+            return ResponseEntity.ok(congeRepository.save(conge));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     // PUT statut
     @PutMapping("/{id}/statut")
     public ResponseEntity<Conge> updateStatut(@PathVariable Long id,
