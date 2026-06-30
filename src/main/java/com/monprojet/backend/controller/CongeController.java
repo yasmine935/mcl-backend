@@ -36,6 +36,9 @@ public class CongeController {
     // POST
     @PostMapping
     public Conge create(@RequestBody Conge conge) {
+        if (conge.getStatut() == null || conge.getStatut().isBlank()) {
+            conge.setStatut("EN_ATTENTE");
+        }
         return congeRepository.save(conge);
     }
 
@@ -47,6 +50,7 @@ public class CongeController {
             conge.setDateFin(congeModifie.getDateFin());
             conge.setType(congeModifie.getType());
             conge.setMotif(congeModifie.getMotif());
+            conge.setPeriode(congeModifie.getPeriode());
             return ResponseEntity.ok(congeRepository.save(conge));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -57,6 +61,9 @@ public class CongeController {
                                               @RequestParam String statut) {
         return congeRepository.findById(id).map(conge -> {
             conge.setStatut(statut);
+            if ("VALIDE_KIA".equals(statut)) {
+                conge.setValideParKia(true);
+            }
             return ResponseEntity.ok(congeRepository.save(conge));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -82,19 +89,19 @@ public class CongeController {
                 .filter(c -> c.getDateDebut() != null && c.getDateDebut().getYear() == anneeEnCours)
                 .collect(Collectors.toList());
 
-        int joursAnnuelPris = congesApprouves.stream()
+        double joursAnnuelPris = congesApprouves.stream()
                 .filter(c -> "ANNUEL".equals(c.getType()))
-                .mapToInt(c -> calculerJours(c.getDateDebut(), c.getDateFin()))
+                .mapToDouble(c -> calculerJours(c.getDateDebut(), c.getDateFin(), c.getPeriode()))
                 .sum();
 
-        int joursRTTPris = congesApprouves.stream()
+        double joursRTTPris = congesApprouves.stream()
                 .filter(c -> "RTT".equals(c.getType()))
-                .mapToInt(c -> calculerJours(c.getDateDebut(), c.getDateFin()))
+                .mapToDouble(c -> calculerJours(c.getDateDebut(), c.getDateFin(), c.getPeriode()))
                 .sum();
 
-        int joursMaladiePris = congesApprouves.stream()
+        double joursMaladiePris = congesApprouves.stream()
                 .filter(c -> "MALADIE".equals(c.getType()))
-                .mapToInt(c -> calculerJours(c.getDateDebut(), c.getDateFin()))
+                .mapToDouble(c -> calculerJours(c.getDateDebut(), c.getDateFin(), c.getPeriode()))
                 .sum();
 
         int soldeAnnuelTotal = 25;
@@ -113,8 +120,11 @@ public class CongeController {
         return ResponseEntity.ok(solde);
     }
 
-    private int calculerJours(LocalDate debut, LocalDate fin) {
+    private double calculerJours(LocalDate debut, LocalDate fin, String periode) {
         if (debut == null || fin == null) return 0;
-        return (int) ChronoUnit.DAYS.between(debut, fin) + 1;
+        if (debut.equals(fin) && ("MATIN".equals(periode) || "APRES_MIDI".equals(periode))) {
+            return 0.5;
+        }
+        return ChronoUnit.DAYS.between(debut, fin) + 1;
     }
 }
