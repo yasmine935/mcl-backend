@@ -116,6 +116,17 @@ public class FicheInterventionController {
             return ResponseEntity.ok(ficheRepository.save(fiche));
         }).orElse(ResponseEntity.notFound().build());
     }
+
+    // ✅ KIA (Technicien Supérieur) confirme le travail avant la validation finale
+    @PutMapping("/{id}/confirmer-kia")
+    public ResponseEntity<FicheIntervention> confirmerKia(@PathVariable Long id, @RequestBody Map<String, Object> data) {
+        return ficheRepository.findById(id).map(fiche -> {
+            fiche.setStatut("VALIDEE_KIA");
+            if (data.get("confirmePar") != null) fiche.setConfirmeParKia((String) data.get("confirmePar"));
+            fiche.setDateConfirmationKia(java.time.LocalDateTime.now().toString());
+            return ResponseEntity.ok(ficheRepository.save(fiche));
+        }).orElse(ResponseEntity.notFound().build());
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (ficheRepository.existsById(id)) { ficheRepository.deleteById(id); return ResponseEntity.ok().build(); }

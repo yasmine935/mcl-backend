@@ -25,6 +25,8 @@ public class FicheIntervention {
     private String dateCompletion;
     private String approuvePar;
     private String dateApprobation;
+    private String confirmeParKia;
+    private String dateConfirmationKia;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -75,6 +77,10 @@ public class FicheIntervention {
     public void setApprouvePar(String approuvePar) { this.approuvePar = approuvePar; }
     public String getDateApprobation() { return dateApprobation; }
     public void setDateApprobation(String dateApprobation) { this.dateApprobation = dateApprobation; }
+    public String getConfirmeParKia() { return confirmeParKia; }
+    public void setConfirmeParKia(String confirmeParKia) { this.confirmeParKia = confirmeParKia; }
+    public String getDateConfirmationKia() { return dateConfirmationKia; }
+    public void setDateConfirmationKia(String dateConfirmationKia) { this.dateConfirmationKia = dateConfirmationKia; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNumProjet() { return numProjet; }

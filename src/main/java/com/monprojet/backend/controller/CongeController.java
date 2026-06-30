@@ -51,6 +51,7 @@ public class CongeController {
             conge.setType(congeModifie.getType());
             conge.setMotif(congeModifie.getMotif());
             conge.setPeriode(congeModifie.getPeriode());
+            conge.setJoursDepassement(congeModifie.getJoursDepassement());
             return ResponseEntity.ok(congeRepository.save(conge));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -58,11 +59,15 @@ public class CongeController {
     // PUT statut
     @PutMapping("/{id}/statut")
     public ResponseEntity<Conge> updateStatut(@PathVariable Long id,
-                                              @RequestParam String statut) {
+                                              @RequestParam String statut,
+                                              @RequestParam(required = false) String validePar) {
         return congeRepository.findById(id).map(conge -> {
             conge.setStatut(statut);
             if ("VALIDE_KIA".equals(statut)) {
                 conge.setValideParKia(true);
+            }
+            if (("APPROUVE".equals(statut) || "REFUSE".equals(statut)) && validePar != null) {
+                conge.setValidePar(validePar);
             }
             return ResponseEntity.ok(congeRepository.save(conge));
         }).orElse(ResponseEntity.notFound().build());

@@ -18,6 +18,8 @@ public class Conge {
     private String statut = "EN_ATTENTE"; // EN_ATTENTE, VALIDE_KIA, APPROUVE, REFUSE
     private Boolean valideParKia = false; // trace: reste true même après la décision finale de Ferid
     private String periode; // null = journée complète, MATIN ou APRES_MIDI = demi-journée
+    private Integer joursDepassement; // nb de jours demandés au-delà du solde restant au moment de l'envoi (0/null = pas de dépassement)
+    private String validePar; // nom de la personne qui a pris la décision finale (APPROUVE/REFUSE)
 
     @ManyToOne
     @JoinColumn(name = "utilisateur_id")
@@ -39,6 +41,10 @@ public class Conge {
     public void setValideParKia(Boolean valideParKia) { this.valideParKia = valideParKia; }
     public String getPeriode() { return periode; }
     public void setPeriode(String periode) { this.periode = periode; }
+    public Integer getJoursDepassement() { return joursDepassement; }
+    public void setJoursDepassement(Integer joursDepassement) { this.joursDepassement = joursDepassement; }
+    public String getValidePar() { return validePar; }
+    public void setValidePar(String validePar) { this.validePar = validePar; }
     public Utilisateur getUtilisateur() { return utilisateur; }
     public void setUtilisateur(Utilisateur utilisateur) { this.utilisateur = utilisateur; }
 }
