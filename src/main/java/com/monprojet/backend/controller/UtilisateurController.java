@@ -5,6 +5,8 @@ import com.monprojet.backend.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -50,10 +52,28 @@ public class UtilisateurController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE supprimer un employé
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        repo.deleteById(id);
-        return ResponseEntity.ok().build();
+    // Désactiver un employé (soft delete)
+    @PutMapping("/{id}/desactiver")
+    public ResponseEntity<Utilisateur> desactiver(@PathVariable Long id,
+                                                  @RequestParam String desactivePar) {
+        return repo.findById(id).map(u -> {
+            u.setActif(false);
+            u.setDesactivePar(desactivePar);
+            u.setDateDesactivation(
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+            );
+            return ResponseEntity.ok(repo.save(u));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // Réactiver un employé
+    @PutMapping("/{id}/reactiver")
+    public ResponseEntity<Utilisateur> reactiver(@PathVariable Long id) {
+        return repo.findById(id).map(u -> {
+            u.setActif(true);
+            u.setDesactivePar(null);
+            u.setDateDesactivation(null);
+            return ResponseEntity.ok(repo.save(u));
+        }).orElse(ResponseEntity.notFound().build());
     }
 }

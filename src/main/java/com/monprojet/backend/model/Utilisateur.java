@@ -22,6 +22,9 @@ public class Utilisateur {
     private String password;
     private String role;
     private String statut;
+    private Boolean actif = true;
+    private String desactivePar;
+    private String dateDesactivation;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -49,4 +52,10 @@ public class Utilisateur {
     public void setStatut(String statut) { this.statut = statut; }
     public boolean isPremierConnexion() { return premierConnexion; }
     public void setPremierConnexion(boolean premierConnexion) { this.premierConnexion = premierConnexion; }
+    public Boolean getActif() { return actif; }
+    public void setActif(Boolean actif) { this.actif = actif; }
+    public String getDesactivePar() { return desactivePar; }
+    public void setDesactivePar(String desactivePar) { this.desactivePar = desactivePar; }
+    public String getDateDesactivation() { return dateDesactivation; }
+    public void setDateDesactivation(String dateDesactivation) { this.dateDesactivation = dateDesactivation; }
 }
