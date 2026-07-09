@@ -18,6 +18,8 @@ public class Client {
     private Boolean actif = true;
     private String desactivePar;
     private String dateDesactivation;
+    private String responsableCommercial;
+    private String typeClient = "Client";
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -37,4 +39,8 @@ public class Client {
     public void setDesactivePar(String desactivePar) { this.desactivePar = desactivePar; }
     public String getDateDesactivation() { return dateDesactivation; }
     public void setDateDesactivation(String dateDesactivation) { this.dateDesactivation = dateDesactivation; }
+    public String getResponsableCommercial() { return responsableCommercial; }
+    public void setResponsableCommercial(String responsableCommercial) { this.responsableCommercial = responsableCommercial; }
+    public String getTypeClient() { return typeClient; }
+    public void setTypeClient(String typeClient) { this.typeClient = typeClient; }
 }
