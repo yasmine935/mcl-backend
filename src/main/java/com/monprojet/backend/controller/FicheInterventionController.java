@@ -61,6 +61,8 @@ public class FicheInterventionController {
             }
             fiche.setTechnicienIds(updated.getTechnicienIds());
             fiche.setTechnicienNoms(updated.getTechnicienNoms());
+            fiche.setNomContactSite(updated.getNomContactSite());
+            fiche.setTelContactSite(updated.getTelContactSite());
             return ResponseEntity.ok(ficheRepository.save(fiche));
         }).orElse(ResponseEntity.notFound().build());
     }

@@ -27,6 +27,8 @@ public class FicheIntervention {
     private String dateApprobation;
     private String confirmeParKia;
     private String dateConfirmationKia;
+    private String nomContactSite;
+    private String telContactSite;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -81,6 +83,10 @@ public class FicheIntervention {
     public void setConfirmeParKia(String confirmeParKia) { this.confirmeParKia = confirmeParKia; }
     public String getDateConfirmationKia() { return dateConfirmationKia; }
     public void setDateConfirmationKia(String dateConfirmationKia) { this.dateConfirmationKia = dateConfirmationKia; }
+    public String getNomContactSite() { return nomContactSite; }
+    public void setNomContactSite(String nomContactSite) { this.nomContactSite = nomContactSite; }
+    public String getTelContactSite() { return telContactSite; }
+    public void setTelContactSite(String telContactSite) { this.telContactSite = telContactSite; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNumProjet() { return numProjet; }
