@@ -26,6 +26,9 @@ public class JournalTravail {
 
     private LocalDateTime dateCreation;
 
+    @Column(columnDefinition = "LONGTEXT")
+    private String signature;
+
     @PrePersist
     public void prePersist() {
         if (this.dateCreation == null) this.dateCreation = LocalDateTime.now();
@@ -43,4 +46,6 @@ public class JournalTravail {
     public void setRapportGenere(String rapportGenere) { this.rapportGenere = rapportGenere; }
     public LocalDateTime getDateCreation() { return dateCreation; }
     public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
+    public String getSignature() { return signature; }
+    public void setSignature(String signature) { this.signature = signature; }
 }

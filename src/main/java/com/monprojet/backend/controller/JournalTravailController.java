@@ -104,6 +104,7 @@ public class JournalTravailController {
         }
         journal.setNotesOriginales(body.getOrDefault("notesOriginales", "").toString());
         journal.setRapportGenere(body.getOrDefault("rapportGenere", "").toString());
+        if (body.get("signature") != null) journal.setSignature(body.get("signature").toString());
         return ResponseEntity.ok(journalRepository.save(journal));
     }
 
