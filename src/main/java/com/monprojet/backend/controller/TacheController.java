@@ -65,6 +65,7 @@ public class TacheController {
             existing.setClientFinal(tache.getClientFinal());
             existing.setChiffreAffaire(tache.getChiffreAffaire());
             existing.setNumDevis(tache.getNumDevis());
+            existing.setCaDevis(tache.getCaDevis());
             existing.setAssignes(tache.getAssignes());
             existing.setEtapes(tache.getEtapes());
             existing.setFichiers(tache.getFichiers());

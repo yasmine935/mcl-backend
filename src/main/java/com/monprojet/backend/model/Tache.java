@@ -26,6 +26,7 @@ public class Tache {
     private String clientFinal;
     private String chiffreAffaire;
     private String numDevis;
+    private String caDevis;
 
     @Column(columnDefinition = "TEXT")
     private String assignes;
@@ -62,6 +63,8 @@ public class Tache {
     public void setChiffreAffaire(String chiffreAffaire) { this.chiffreAffaire = chiffreAffaire; }
     public String getNumDevis() { return numDevis; }
     public void setNumDevis(String numDevis) { this.numDevis = numDevis; }
+    public String getCaDevis() { return caDevis; }
+    public void setCaDevis(String caDevis) { this.caDevis = caDevis; }
     public String getAssignes() { return assignes; }
     public void setAssignes(String assignes) { this.assignes = assignes; }
     public String getEtapes() { return etapes; }
