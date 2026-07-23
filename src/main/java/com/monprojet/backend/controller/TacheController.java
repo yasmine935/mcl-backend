@@ -63,6 +63,7 @@ public class TacheController {
             existing.setDateEcheance(tache.getDateEcheance());
             existing.setClient(tache.getClient());
             existing.setClientFinal(tache.getClientFinal());
+            existing.setAdresse(tache.getAdresse());
             existing.setChiffreAffaire(tache.getChiffreAffaire());
             existing.setNumDevis(tache.getNumDevis());
             existing.setCaDevis(tache.getCaDevis());

@@ -24,6 +24,7 @@ public class Tache {
 
     private String client;
     private String clientFinal;
+    private String adresse;
     private String chiffreAffaire;
     private String numDevis;
     private String caDevis;
@@ -59,6 +60,8 @@ public class Tache {
     public void setClient(String client) { this.client = client; }
     public String getClientFinal() { return clientFinal; }
     public void setClientFinal(String clientFinal) { this.clientFinal = clientFinal; }
+    public String getAdresse() { return adresse; }
+    public void setAdresse(String adresse) { this.adresse = adresse; }
     public String getChiffreAffaire() { return chiffreAffaire; }
     public void setChiffreAffaire(String chiffreAffaire) { this.chiffreAffaire = chiffreAffaire; }
     public String getNumDevis() { return numDevis; }
