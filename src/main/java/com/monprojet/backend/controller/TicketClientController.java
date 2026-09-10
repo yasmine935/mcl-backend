@@ -1,8 +1,10 @@
 package com.monprojet.backend.controller;
 
+import com.monprojet.backend.dto.TicketClientDtos.CommentaireRequest;
 import com.monprojet.backend.dto.TicketClientDtos.CreationRequest;
 import com.monprojet.backend.dto.TicketClientDtos.DecisionRequest;
 import com.monprojet.backend.model.TicketClient;
+import com.monprojet.backend.model.TicketClientEvenement;
 import com.monprojet.backend.service.TicketClientService;
 import com.monprojet.backend.service.TicketClientService.Refus;
 import com.monprojet.backend.service.TicketClientService.Resultat;
@@ -41,6 +43,21 @@ public class TicketClientController {
     @GetMapping("/{id}")
     public ResponseEntity<?> parId(@PathVariable Long id, Principal principal, Authentication auth) {
         return traduire(service.parId(id, principal.getName(), auth));
+    }
+
+    // Timeline du ticket (historique + échanges) — accès cloisonné.
+    @GetMapping("/{id}/evenements")
+    public ResponseEntity<List<TicketClientEvenement>> evenements(@PathVariable Long id,
+                                                                  Principal principal, Authentication auth) {
+        List<TicketClientEvenement> evts = service.evenements(id, principal.getName(), auth);
+        return evts == null ? ResponseEntity.status(403).build() : ResponseEntity.ok(evts);
+    }
+
+    // Ajout d'un commentaire par le client propriétaire ou un valideur.
+    @PostMapping("/{id}/commentaires")
+    public ResponseEntity<?> commenter(@PathVariable Long id, @Valid @RequestBody CommentaireRequest req,
+                                       Principal principal, Authentication auth) {
+        return traduire(service.commenter(id, req.contenu(), principal.getName(), auth));
     }
 
     // Décisions de valideur — le service vérifie le rôle et le « premier qui prend ».

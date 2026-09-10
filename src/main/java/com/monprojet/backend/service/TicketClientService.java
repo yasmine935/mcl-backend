@@ -2,7 +2,9 @@ package com.monprojet.backend.service;
 
 import com.monprojet.backend.dto.TicketClientDtos.CreationRequest;
 import com.monprojet.backend.model.TicketClient;
+import com.monprojet.backend.model.TicketClientEvenement;
 import com.monprojet.backend.model.Utilisateur;
+import com.monprojet.backend.repository.TicketClientEvenementRepository;
 import com.monprojet.backend.repository.TicketClientRepository;
 import com.monprojet.backend.repository.UtilisateurRepository;
 import org.springframework.security.core.Authentication;
@@ -31,11 +33,29 @@ public class TicketClientService {
     }
 
     private final TicketClientRepository repo;
+    private final TicketClientEvenementRepository evenementRepo;
     private final UtilisateurRepository utilisateurRepository;
 
-    public TicketClientService(TicketClientRepository repo, UtilisateurRepository utilisateurRepository) {
+    public TicketClientService(TicketClientRepository repo,
+                               TicketClientEvenementRepository evenementRepo,
+                               UtilisateurRepository utilisateurRepository) {
         this.repo = repo;
+        this.evenementRepo = evenementRepo;
         this.utilisateurRepository = utilisateurRepository;
+    }
+
+    /** Enregistre un événement dans la timeline du ticket. */
+    private void tracer(TicketClient ticket, Utilisateur auteur, String type,
+                        String message, String ancien, String nouveau) {
+        TicketClientEvenement e = new TicketClientEvenement();
+        e.setTicket(ticket);
+        e.setAuteur(auteur);
+        e.setType(type);
+        e.setMessage(message);
+        e.setAncienStatut(ancien);
+        e.setNouveauStatut(nouveau);
+        e.setDateCreation(LocalDateTime.now());
+        evenementRepo.save(e);
     }
 
     private boolean estValideur(Authentication auth) {
@@ -58,7 +78,30 @@ public class TicketClientService {
         t.setDateMaj(LocalDateTime.now());
         long count = repo.count();
         t.setNumero("TC-" + String.format("%04d", count + 1));
-        return repo.save(t);
+        TicketClient sauve = repo.save(t);
+        tracer(sauve, client, TicketClientEvenement.CREATION, null, null, TicketClient.EN_ATTENTE_VALIDATION);
+        return sauve;
+    }
+
+    /** Ajoute un commentaire (échange) au ticket — par le client propriétaire ou un valideur. */
+    @Transactional
+    public Resultat commenter(Long id, String contenu, String username, Authentication auth) {
+        if (contenu == null || contenu.isBlank()) return Resultat.ko(Refus.TRANSITION_INVALIDE);
+        Optional<TicketClient> opt = repo.findById(id);
+        if (opt.isEmpty()) return Resultat.ko(Refus.INTROUVABLE);
+        TicketClient t = opt.get();
+        if (!peutVoir(t, username, auth)) return Resultat.ko(Refus.NON_AUTORISE);
+        Utilisateur auteur = utilisateurRepository.findByUsername(username).orElse(null);
+        tracer(t, auteur, TicketClientEvenement.COMMENTAIRE, contenu, null, null);
+        t.setDateMaj(LocalDateTime.now());
+        return Resultat.ok(repo.save(t));
+    }
+
+    /** Timeline du ticket (création, statuts, commentaires) — accès cloisonné. */
+    public List<TicketClientEvenement> evenements(Long id, String username, Authentication auth) {
+        Optional<TicketClient> opt = repo.findById(id);
+        if (opt.isEmpty() || !peutVoir(opt.get(), username, auth)) return null;
+        return evenementRepo.findByTicketIdOrderByDateCreationAsc(id);
     }
 
     /** Liste cloisonnée : un valideur voit tout, un client ne voit que ses tickets. */
@@ -109,6 +152,7 @@ public class TicketClientService {
             return Resultat.ko(Refus.TRANSITION_INVALIDE);
         }
 
+        String ancien = t.getStatut();
         t.setStatut(nouveauStatut);
         if (t.getTraitePar() == null) {
             t.setTraitePar(acteur);
@@ -118,7 +162,9 @@ public class TicketClientService {
             t.setCommentaireValidation(commentaire);
         }
         t.setDateMaj(LocalDateTime.now());
-        return Resultat.ok(repo.save(t));
+        TicketClient sauve = repo.save(t);
+        tracer(sauve, acteur, TicketClientEvenement.STATUT, commentaire, ancien, nouveauStatut);
+        return Resultat.ok(sauve);
     }
 
     /** Transitions autorisées du cycle de vie. */

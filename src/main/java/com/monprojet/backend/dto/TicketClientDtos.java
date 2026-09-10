@@ -15,4 +15,8 @@ public final class TicketClientDtos {
 
     /** Décision d'un valideur (validation, rejet) avec commentaire optionnel. */
     public record DecisionRequest(String commentaire) {}
+
+    /** Ajout d'un commentaire/échange sur le ticket. */
+    public record CommentaireRequest(
+            @NotBlank(message = "commentaire vide") String contenu) {}
 }
