@@ -15,7 +15,7 @@ import java.util.List;
  * Crée des comptes de test — UNIQUEMENT sous le profil "demo" (base H2 jetable).
  * Ne s'active jamais en prod (profil "local"). Mot de passe commun : demo1234.
  */
-@Profile("demo")
+@Profile({"demo", "seed"})
 @Component
 public class DemoDataSeeder implements CommandLineRunner {
 

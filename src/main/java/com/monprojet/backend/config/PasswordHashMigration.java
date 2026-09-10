@@ -5,6 +5,7 @@ import com.monprojet.backend.repository.UtilisateurRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.List;
  * Migration ponctuelle : hache en BCrypt les mots de passe encore stockés en clair.
  * Idempotent — un hash BCrypt existant (préfixe $2a$/$2b$/$2y$) n'est jamais re-haché.
  */
+@Profile("!schemagen")
 @Component
 public class PasswordHashMigration implements CommandLineRunner {
 

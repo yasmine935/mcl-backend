@@ -5,6 +5,7 @@ import com.monprojet.backend.repository.UtilisateurRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Map;
  * Migration ponctuelle : remplace les anciens rôles-prénoms par des rôles
  * fonctionnels. Idempotente — un rôle déjà fonctionnel n'est jamais retouché.
  */
+@Profile("!schemagen")
 @Component
 public class RoleMigration implements CommandLineRunner {
 
