@@ -51,9 +51,8 @@ public class PasswordResetController {
         return resetRepo.findByStatut("EN_ATTENTE");
     }
 
-    // Admin réinitialise le mot de passe (temporaire : l'utilisateur devra le changer à la connexion)
-    // TODO sécurité : cet endpoint reste appelable sans authentification tant que la
-    // protection par token (phase JWT) n'est pas en place.
+    // Admin réinitialise le mot de passe (temporaire : l'utilisateur devra le changer à la connexion).
+    // Protégé par SecurityConfig : /api/auth/reset-requests/** exige le rôle admin.
     @PutMapping("/reset-requests/{id}/reset")
     public ResponseEntity<?> resetPassword(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String newPassword = body.get("newPassword");
@@ -81,15 +80,19 @@ public class PasswordResetController {
         return ResponseEntity.ok("Mot de passe réinitialisé");
     }
 
-    // Changer son propre mot de passe — exige le mot de passe actuel
+    // Changer son propre mot de passe — exige le mot de passe actuel.
+    // La cible est le porteur du jeton, jamais un username fourni par le client.
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> body,
+                                            java.security.Principal principal) {
+        if (principal == null || principal.getName() == null) {
+            return ResponseEntity.status(401).build();
+        }
+        String username = principal.getName();
         String currentPassword = body.get("currentPassword");
         String newPassword = body.get("newPassword");
 
-        if (username == null || currentPassword == null
-                || newPassword == null || newPassword.length() < 4) {
+        if (currentPassword == null || newPassword == null || newPassword.length() < 4) {
             return ResponseEntity.badRequest().body("Champs manquants ou mot de passe trop court");
         }
 
