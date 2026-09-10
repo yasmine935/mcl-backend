@@ -28,6 +28,13 @@ public class SecurityConfig {
     @Value("${app.cors.allowed-origins:http://localhost:4200}")
     private String[] allowedOrigins;
 
+    // Rôles internes (tous sauf CLIENT) : un compte client externe ne doit atteindre
+    // que son espace ticketing, jamais les endpoints métier internes.
+    private static final String[] ROLES_INTERNES = {
+        "ADMINISTRATEUR", "DIRECTION", "RH", "COMPTABILITE", "SUPPLY_CHAIN",
+        "ADMINISTRATIF", "MANAGER", "TECHNICIEN", "TECHNICIEN_SUP"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         http
@@ -47,8 +54,13 @@ public class SecurityConfig {
                 // publique — elle expose des données personnelles (téléphone, email).
                 .requestMatchers(HttpMethod.GET, "/api/visiteurs").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/tickets").permitAll()
-                // Tout le reste exige un jeton valide
-                .anyRequest().authenticated())
+                // Chacun peut changer son propre mot de passe (clients inclus)
+                .requestMatchers(HttpMethod.PUT, "/api/auth/change-password").authenticated()
+                // Espace ticketing client : accessible au client ET aux valideurs internes
+                // (le cloisonnement fin est assuré par le service)
+                .requestMatchers("/api/tickets-client/**").authenticated()
+                // Tout le reste = domaine interne : interdit aux comptes CLIENT
+                .anyRequest().hasAnyAuthority(ROLES_INTERNES))
             .exceptionHandling(e -> e.authenticationEntryPoint(
                 (request, response, ex) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
