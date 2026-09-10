@@ -1,114 +1,65 @@
 package com.monprojet.backend.controller;
 
+import com.monprojet.backend.dto.AuthDtos.AdminResetRequest;
+import com.monprojet.backend.dto.AuthDtos.ChangePasswordRequest;
+import com.monprojet.backend.dto.AuthDtos.ForgotPasswordRequest;
 import com.monprojet.backend.model.ResetPasswordRequest;
-import com.monprojet.backend.model.Utilisateur;
-import com.monprojet.backend.repository.ResetPasswordRequestRepository;
-import com.monprojet.backend.repository.UtilisateurRepository;
+import com.monprojet.backend.service.PasswordResetService;
+import com.monprojet.backend.service.PasswordResetService.Resultat;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.security.Principal;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
 public class PasswordResetController {
 
-    private final ResetPasswordRequestRepository resetRepo;
-    private final UtilisateurRepository utilisateurRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordResetService service;
 
-    public PasswordResetController(ResetPasswordRequestRepository resetRepo,
-                                   UtilisateurRepository utilisateurRepository,
-                                   PasswordEncoder passwordEncoder) {
-        this.resetRepo = resetRepo;
-        this.utilisateurRepository = utilisateurRepository;
-        this.passwordEncoder = passwordEncoder;
+    public PasswordResetController(PasswordResetService service) {
+        this.service = service;
     }
 
-    // Demande mot de passe oublié
+    // Demande mot de passe oublié (public)
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        Optional<Utilisateur> opt = utilisateurRepository.findByUsername(username);
-        if (opt.isEmpty()) return ResponseEntity.badRequest().body("Utilisateur introuvable");
-
-        ResetPasswordRequest req = new ResetPasswordRequest();
-        req.setUsername(username);
-        req.setStatut("EN_ATTENTE");
-        req.setDatedemande(LocalDateTime.now().toString());
-        resetRepo.save(req);
-
-        return ResponseEntity.ok("Demande envoyée");
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest requete) {
+        return service.creerDemande(requete.username()) == Resultat.OK
+                ? ResponseEntity.ok("Demande envoyée")
+                : ResponseEntity.badRequest().body("Utilisateur introuvable");
     }
 
-    // Liste des demandes (pour admin)
+    // Liste des demandes — réservé à l'admin (SecurityConfig)
     @GetMapping("/reset-requests")
     public List<ResetPasswordRequest> getRequests() {
-        return resetRepo.findByStatut("EN_ATTENTE");
+        return service.demandesEnAttente();
     }
 
-    // Admin réinitialise le mot de passe (temporaire : l'utilisateur devra le changer à la connexion).
-    // Protégé par SecurityConfig : /api/auth/reset-requests/** exige le rôle admin.
+    // Reset admin : mot de passe temporaire, à changer à la connexion — réservé à l'admin
     @PutMapping("/reset-requests/{id}/reset")
-    public ResponseEntity<?> resetPassword(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        String newPassword = body.get("newPassword");
-        if (newPassword == null || newPassword.length() < 4) {
-            return ResponseEntity.badRequest().body("Mot de passe trop court");
-        }
-        Optional<ResetPasswordRequest> optReq = resetRepo.findById(id);
-        if (optReq.isEmpty()) return ResponseEntity.notFound().build();
-
-        ResetPasswordRequest req = optReq.get();
-        if (!"EN_ATTENTE".equals(req.getStatut())) {
-            return ResponseEntity.badRequest().body("Demande déjà traitée");
-        }
-        Optional<Utilisateur> optUser = utilisateurRepository.findByUsername(req.getUsername());
-        if (optUser.isEmpty()) return ResponseEntity.notFound().build();
-
-        Utilisateur u = optUser.get();
-        u.setPassword(passwordEncoder.encode(newPassword));
-        u.setPremierConnexion(true);
-        utilisateurRepository.save(u);
-
-        req.setStatut("TRAITE");
-        resetRepo.save(req);
-
-        return ResponseEntity.ok("Mot de passe réinitialisé");
+    public ResponseEntity<?> resetPassword(@PathVariable Long id,
+                                           @Valid @RequestBody AdminResetRequest requete) {
+        return switch (service.reinitialiser(id, requete.newPassword())) {
+            case OK -> ResponseEntity.ok("Mot de passe réinitialisé");
+            case DEJA_TRAITEE -> ResponseEntity.badRequest().body("Demande déjà traitée");
+            default -> ResponseEntity.notFound().build();
+        };
     }
 
-    // Changer son propre mot de passe — exige le mot de passe actuel.
-    // La cible est le porteur du jeton, jamais un username fourni par le client.
+    // Changer son propre mot de passe — la cible est le porteur du jeton
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> body,
-                                            java.security.Principal principal) {
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest requete,
+                                            Principal principal) {
         if (principal == null || principal.getName() == null) {
             return ResponseEntity.status(401).build();
         }
-        String username = principal.getName();
-        String currentPassword = body.get("currentPassword");
-        String newPassword = body.get("newPassword");
-
-        if (currentPassword == null || newPassword == null || newPassword.length() < 4) {
-            return ResponseEntity.badRequest().body("Champs manquants ou mot de passe trop court");
-        }
-
-        Optional<Utilisateur> opt = utilisateurRepository.findByUsername(username);
-        if (opt.isEmpty()) return ResponseEntity.notFound().build();
-
-        Utilisateur u = opt.get();
-        if (u.getPassword() == null
-                || !passwordEncoder.matches(currentPassword, u.getPassword())) {
-            return ResponseEntity.status(401).body("Mot de passe actuel incorrect");
-        }
-
-        u.setPassword(passwordEncoder.encode(newPassword));
-        u.setPremierConnexion(false);
-        utilisateurRepository.save(u);
-
-        return ResponseEntity.ok("ok");
+        return switch (service.changerMotDePasse(principal.getName(),
+                requete.currentPassword(), requete.newPassword())) {
+            case OK -> ResponseEntity.ok("ok");
+            case MAUVAIS_MOT_DE_PASSE -> ResponseEntity.status(401).body("Mot de passe actuel incorrect");
+            default -> ResponseEntity.notFound().build();
+        };
     }
 }

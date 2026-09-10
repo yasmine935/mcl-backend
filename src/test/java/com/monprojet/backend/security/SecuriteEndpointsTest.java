@@ -41,7 +41,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         UtilisateurController.class,
         TicketController.class
 })
-@Import({SecurityConfig.class, SecurityBeansConfig.class, JwtService.class, JwtAuthFilter.class})
+@Import({SecurityConfig.class, SecurityBeansConfig.class, JwtService.class, JwtAuthFilter.class,
+        com.monprojet.backend.exception.GlobalExceptionHandler.class,
+        com.monprojet.backend.service.AuthService.class,
+        com.monprojet.backend.service.PasswordResetService.class,
+        com.monprojet.backend.service.UtilisateurService.class,
+        com.monprojet.backend.service.TicketService.class})
 @TestPropertySource(properties = {
         "app.jwt.secret=cle-de-test-suffisamment-longue-0123456789",
         "app.jwt.expiration-hours=1"
@@ -93,8 +98,27 @@ class SecuriteEndpointsTest {
 
         when(ticketRepository.count()).thenReturn(0L);
         when(ticketRepository.save(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
-        mockMvc.perform(post("/api/tickets").contentType("application/json").content("{}"))
+        mockMvc.perform(post("/api/tickets").contentType("application/json")
+                        .content("{\"nom\":\"Dupont\",\"descriptionPanne\":\"Écran HS\"}"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void laValidationRejetteLesEntreesIncompletes() throws Exception {
+        // Ticket public sans champs essentiels → 400 (et pas de stack trace)
+        mockMvc.perform(post("/api/tickets").contentType("application/json").content("{}"))
+                .andExpect(status().isBadRequest());
+
+        // Login sans mot de passe → 400 de validation
+        mockMvc.perform(post("/api/auth/login").contentType("application/json")
+                        .content("{\"username\":\"jean\"}"))
+                .andExpect(status().isBadRequest());
+
+        // Nouveau mot de passe trop court (< 8) → 400
+        mockMvc.perform(put("/api/auth/change-password").header("Authorization", jeton("TECHNICIEN"))
+                        .contentType("application/json")
+                        .content("{\"currentPassword\":\"a\",\"newPassword\":\"court\"}"))
+                .andExpect(status().isBadRequest());
     }
 
     // --- Autorisations par rôle : gestion des employés ---
