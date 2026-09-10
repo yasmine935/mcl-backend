@@ -6,6 +6,7 @@ import com.monprojet.backend.repository.CategorieTacheRepository;
 import com.monprojet.backend.repository.OptionTacheRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -28,6 +29,8 @@ public class CategorieTacheController {
         return categorieRepo.findAll().stream().map(this::toDto).collect(Collectors.toList());
     }
 
+    // Gestion du référentiel des catégories : réservée à l'administrateur
+    @PreAuthorize("hasAuthority('ADMINISTRATEUR')")
     @PostMapping
     public Map<String, Object> creer(@RequestBody Map<String, String> body) {
         CategorieTache categorie = new CategorieTache();
@@ -36,6 +39,7 @@ public class CategorieTacheController {
         return toDto(categorie);
     }
 
+    @PreAuthorize("hasAuthority('ADMINISTRATEUR')")
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> modifier(@PathVariable Long id, @RequestBody Map<String, String> body) {
         return categorieRepo.findById(id).map(categorie -> {
@@ -45,6 +49,7 @@ public class CategorieTacheController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAuthority('ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> supprimer(@PathVariable Long id) {
         optionRepo.deleteAll(optionRepo.findByCategorieId(id));
@@ -52,6 +57,7 @@ public class CategorieTacheController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAuthority('ADMINISTRATEUR')")
     @PostMapping("/{id}/options")
     public ResponseEntity<Map<String, Object>> ajouterOption(@PathVariable Long id, @RequestBody Map<String, String> body) {
         return categorieRepo.findById(id).map(categorie -> {
@@ -63,6 +69,7 @@ public class CategorieTacheController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAuthority('ADMINISTRATEUR')")
     @PutMapping("/options/{optionId}")
     public ResponseEntity<Void> modifierOption(@PathVariable Long optionId, @RequestBody Map<String, String> body) {
         return optionRepo.findById(optionId).map(option -> {
@@ -72,6 +79,7 @@ public class CategorieTacheController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAuthority('ADMINISTRATEUR')")
     @DeleteMapping("/options/{optionId}")
     public ResponseEntity<Void> supprimerOption(@PathVariable Long optionId) {
         optionRepo.deleteById(optionId);

@@ -4,6 +4,7 @@ import com.monprojet.backend.model.MiseAuTravail;
 import com.monprojet.backend.repository.MiseAuTravailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +38,7 @@ public class MiseAuTravailController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('TECHNICIEN_SUP','ADMINISTRATEUR')")
     @PostMapping
     public ResponseEntity<MiseAuTravail> create(@RequestBody MiseAuTravail mat) {
         mat.setDateCreation(LocalDateTime.now());
@@ -46,6 +48,7 @@ public class MiseAuTravailController {
         return ResponseEntity.ok(miseAuTravailRepository.save(mat));
     }
 
+    @PreAuthorize("hasAnyAuthority('TECHNICIEN_SUP','ADMINISTRATEUR')")
     @PutMapping("/{id}/statut")
     public ResponseEntity<MiseAuTravail> updateStatut(
             @PathVariable Long id, @RequestParam String statut) {
@@ -55,6 +58,7 @@ public class MiseAuTravailController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('TECHNICIEN_SUP','ADMINISTRATEUR')")
     @PutMapping("/{id}")
     public ResponseEntity<MiseAuTravail> update(
             @PathVariable Long id, @RequestBody MiseAuTravail data) {
@@ -83,6 +87,7 @@ public class MiseAuTravailController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('TECHNICIEN_SUP','ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         miseAuTravailRepository.deleteById(id);

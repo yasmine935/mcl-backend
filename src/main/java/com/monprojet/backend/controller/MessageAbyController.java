@@ -5,6 +5,7 @@ import com.monprojet.backend.model.MessageAbyReply;
 import com.monprojet.backend.repository.MessageAbyRepository;
 import com.monprojet.backend.repository.MessageAbyReplyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,6 +36,7 @@ public class MessageAbyController {
         return repo.findByExpediteurOrderByDateEnvoiDesc(exp);
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','MANAGER','ADMINISTRATEUR')")
     @PostMapping
     public MessageAby envoyer(@RequestBody MessageAby msg) {
         msg.setDateEnvoi(LocalDateTime.now());
@@ -42,6 +44,7 @@ public class MessageAbyController {
         return repo.save(msg);
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','MANAGER','ADMINISTRATEUR')")
     @PutMapping("/{id}/lu")
     public void marquerLu(@PathVariable Long id) {
         repo.findById(id).ifPresent(m -> {
@@ -50,6 +53,7 @@ public class MessageAbyController {
         });
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','MANAGER','ADMINISTRATEUR')")
     @PutMapping("/{id}/repondre")
     public MessageAby repondre(@PathVariable Long id, @RequestBody Map<String, String> body) {
         return repo.findById(id).map(m -> {
@@ -61,6 +65,7 @@ public class MessageAbyController {
         }).orElseThrow();
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','MANAGER','ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public void supprimer(@PathVariable Long id) {
         repo.deleteById(id);
@@ -73,6 +78,7 @@ public class MessageAbyController {
         return replyRepo.findByMessageIdOrderByDateEnvoiAsc(id);
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','MANAGER','ADMINISTRATEUR')")
     @PostMapping("/{id}/replies")
     public MessageAbyReply addReply(@PathVariable Long id, @RequestBody Map<String, String> body) {
         return repo.findById(id).map(msg -> {

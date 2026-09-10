@@ -5,6 +5,7 @@ import com.monprojet.backend.model.Utilisateur;
 import com.monprojet.backend.repository.FicheInterventionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,11 +35,13 @@ public class FicheInterventionController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','DIRECTION','ADMINISTRATEUR')")
     @PostMapping
     public FicheIntervention create(@RequestBody FicheIntervention fiche) {
         return ficheRepository.save(fiche);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','DIRECTION','ADMINISTRATEUR')")
     @PutMapping("/{id}")
     public ResponseEntity<FicheIntervention> update(@PathVariable Long id, @RequestBody FicheIntervention updated) {
         return ficheRepository.findById(id).map(fiche -> {
@@ -74,6 +77,7 @@ public class FicheInterventionController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','DIRECTION','ADMINISTRATEUR')")
     @PutMapping("/{id}/statut")
     public ResponseEntity<FicheIntervention> updateStatut(@PathVariable Long id, @RequestParam String statut) {
         return ficheRepository.findById(id).map(fiche -> {
@@ -108,6 +112,7 @@ public class FicheInterventionController {
         if (str(data, "materielsHorsStandard") != null) fiche.setMaterielsHorsStandard(str(data, "materielsHorsStandard"));
         if (str(data, "photos") != null) fiche.setPhotos(str(data, "photos"));
     }
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','DIRECTION','ADMINISTRATEUR')")
     @PutMapping("/{id}/valider")
     public ResponseEntity<FicheIntervention> validerFiche(@PathVariable Long id, @RequestBody Map<String, Object> data) {
         return ficheRepository.findById(id).map(fiche -> {
@@ -119,6 +124,7 @@ public class FicheInterventionController {
     }
 
     // ✅ KIA (Technicien Supérieur) confirme le travail avant la validation finale
+    @PreAuthorize("hasAnyAuthority('TECHNICIEN_SUP','ADMINISTRATEUR')")
     @PutMapping("/{id}/confirmer-kia")
     public ResponseEntity<FicheIntervention> confirmerKia(@PathVariable Long id, @RequestBody Map<String, Object> data) {
         return ficheRepository.findById(id).map(fiche -> {
@@ -128,6 +134,7 @@ public class FicheInterventionController {
             return ResponseEntity.ok(ficheRepository.save(fiche));
         }).orElse(ResponseEntity.notFound().build());
     }
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','DIRECTION','ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (ficheRepository.existsById(id)) { ficheRepository.deleteById(id); return ResponseEntity.ok().build(); }

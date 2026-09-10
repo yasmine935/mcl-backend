@@ -42,9 +42,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/forgot-password").permitAll()
                 // Réservé à l'administrateur
                 .requestMatchers("/api/auth/reset-requests/**").hasAuthority("ADMINISTRATEUR")
-                // Écrans publics : accueil visiteurs et création de ticket
+                // Écrans publics : borne d'accueil visiteurs (lecture seule) et
+                // dépôt de ticket (création uniquement). La LISTE des tickets n'est plus
+                // publique — elle expose des données personnelles (téléphone, email).
                 .requestMatchers(HttpMethod.GET, "/api/visiteurs").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/tickets").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/tickets").permitAll()
                 // Tout le reste exige un jeton valide
                 .anyRequest().authenticated())

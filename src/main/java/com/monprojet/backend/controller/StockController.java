@@ -4,6 +4,7 @@ import com.monprojet.backend.model.Stock;
 import com.monprojet.backend.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +33,7 @@ public class StockController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','ADMINISTRATEUR')")
     @PostMapping
     public ResponseEntity<Stock> create(@RequestBody Stock stock) {
         stock.setDateCreation(LocalDateTime.now());
@@ -39,6 +41,7 @@ public class StockController {
         return ResponseEntity.ok(stockRepository.save(stock));
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','ADMINISTRATEUR')")
     @PutMapping("/{id}")
     public ResponseEntity<Stock> update(@PathVariable Long id, @RequestBody Stock stock) {
         return stockRepository.findById(id).map(existing -> {
@@ -54,6 +57,7 @@ public class StockController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         stockRepository.deleteById(id);

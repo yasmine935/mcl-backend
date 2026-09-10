@@ -4,6 +4,7 @@ import com.monprojet.backend.model.Commande;
 import com.monprojet.backend.repository.CommandeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +33,7 @@ public class CommandeController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','ADMINISTRATEUR')")
     @PostMapping
     public ResponseEntity<Commande> create(@RequestBody Commande commande) {
         commande.setStatut("EN_ATTENTE");
@@ -41,6 +43,7 @@ public class CommandeController {
         return ResponseEntity.ok(commandeRepository.save(commande));
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','ADMINISTRATEUR')")
     @PutMapping("/{id}/statut")
     public ResponseEntity<Commande> updateStatut(
             @PathVariable Long id, @RequestParam String statut) {
@@ -50,6 +53,7 @@ public class CommandeController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','ADMINISTRATEUR')")
     @PutMapping("/{id}")
     public ResponseEntity<Commande> update(@PathVariable Long id, @RequestBody Commande commande) {
         return commandeRepository.findById(id).map(existing -> {
@@ -61,6 +65,7 @@ public class CommandeController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         commandeRepository.deleteById(id);

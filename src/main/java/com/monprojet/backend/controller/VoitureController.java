@@ -4,6 +4,7 @@ import com.monprojet.backend.model.Voiture;
 import com.monprojet.backend.repository.VoitureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,12 +37,14 @@ public class VoitureController {
     }
 
     // POST
+    @PreAuthorize("hasAnyAuthority('RH','ADMINISTRATEUR')")
     @PostMapping
     public Voiture create(@RequestBody Voiture voiture) {
         return voitureRepository.save(voiture);
     }
 
     // PUT
+    @PreAuthorize("hasAnyAuthority('RH','ADMINISTRATEUR')")
     @PutMapping("/{id}")
     public ResponseEntity<Voiture> update(@PathVariable Long id, @RequestBody Voiture voiture) {
         return voitureRepository.findById(id).map(existing -> {
@@ -61,6 +64,7 @@ public class VoitureController {
     }
 
     // PUT STATUT
+    @PreAuthorize("hasAnyAuthority('RH','ADMINISTRATEUR')")
     @PutMapping("/{id}/statut")
     public ResponseEntity<Voiture> updateStatut(@PathVariable Long id, @RequestParam String statut) {
         return voitureRepository.findById(id).map(v -> {
@@ -70,6 +74,7 @@ public class VoitureController {
     }
 
     // DELETE
+    @PreAuthorize("hasAnyAuthority('RH','ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (voitureRepository.existsById(id)) {

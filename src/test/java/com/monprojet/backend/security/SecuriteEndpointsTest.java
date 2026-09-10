@@ -39,7 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         AuthController.class,
         PasswordResetController.class,
         UtilisateurController.class,
-        TicketController.class
+        TicketController.class,
+        com.monprojet.backend.controller.CongeController.class
 })
 @Import({SecurityConfig.class, SecurityBeansConfig.class, JwtService.class, JwtAuthFilter.class,
         com.monprojet.backend.exception.GlobalExceptionHandler.class,
@@ -60,6 +61,7 @@ class SecuriteEndpointsTest {
     @MockBean private UtilisateurRepository utilisateurRepository;
     @MockBean private ResetPasswordRequestRepository resetRepo;
     @MockBean private TicketRepository ticketRepository;
+    @MockBean private com.monprojet.backend.repository.CongeRepository congeRepository;
 
     private String jeton(String role) {
         Utilisateur u = new Utilisateur();
@@ -92,15 +94,33 @@ class SecuriteEndpointsTest {
     // --- Écrans publics ---
 
     @Test
-    void lesEcransPublicsRestentAccessiblesSansJeton() throws Exception {
-        when(ticketRepository.findAllByOrderByDateCreationDesc()).thenReturn(List.of());
-        mockMvc.perform(get("/api/tickets")).andExpect(status().isOk());
-
+    void leDepotDeTicketResteAccessibleSansJeton() throws Exception {
         when(ticketRepository.count()).thenReturn(0L);
         when(ticketRepository.save(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
+        // Création publique conservée
         mockMvc.perform(post("/api/tickets").contentType("application/json")
                         .content("{\"nom\":\"Dupont\",\"descriptionPanne\":\"Écran HS\"}"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void laListeDesTicketsNEstPlusPublique() throws Exception {
+        // La liste expose des données personnelles → 401 sans jeton
+        mockMvc.perform(get("/api/tickets")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void unTechnicienNePeutPasSupprimerLesCongesDAutrui() throws Exception {
+        // Cas emblématique du ré-audit : DELETE /api/conges réservé au propriétaire ou à la gestion.
+        // Le congé appartient à "essan", supprimé par un technicien "test-technicien" → 403.
+        com.monprojet.backend.model.Utilisateur proprio = new com.monprojet.backend.model.Utilisateur();
+        proprio.setUsername("essan");
+        com.monprojet.backend.model.Conge conge = new com.monprojet.backend.model.Conge();
+        conge.setUtilisateur(proprio);
+        when(congeRepository.findById(1L)).thenReturn(Optional.of(conge));
+
+        mockMvc.perform(delete("/api/conges/1").header("Authorization", jeton("TECHNICIEN")))
+                .andExpect(status().isForbidden());
     }
 
     @Test

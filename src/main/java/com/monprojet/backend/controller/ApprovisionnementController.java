@@ -5,6 +5,7 @@ import com.monprojet.backend.model.DemandeApprovisionnement;
 import com.monprojet.backend.repository.ArticleAttenteRepository;
 import com.monprojet.backend.repository.DemandeApprovisionnementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,6 +39,7 @@ public class ApprovisionnementController {
         return demandeRepo.save(demande);
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','ADMINISTRATEUR')")
     @PutMapping("/demandes-appro/{id}/statut")
     public DemandeApprovisionnement changerStatut(
             @PathVariable Long id,
@@ -50,6 +52,7 @@ public class ApprovisionnementController {
         return demandeRepo.save(d);
     }
 
+    @PreAuthorize("hasAnyAuthority('SUPPLY_CHAIN','ADMINISTRATEUR')")
     @DeleteMapping("/demandes-appro/{id}")
     public void delete(@PathVariable Long id) {
         demandeRepo.deleteById(id);

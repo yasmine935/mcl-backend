@@ -4,6 +4,7 @@ import com.monprojet.backend.model.Tache;
 import com.monprojet.backend.repository.TacheRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +38,7 @@ public class TacheController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','SUPPLY_CHAIN','ADMINISTRATEUR')")
     @PostMapping
     public ResponseEntity<Tache> create(@RequestBody Tache tache) {
         tache.setStatut("A_FAIRE");
@@ -44,6 +46,7 @@ public class TacheController {
         return ResponseEntity.ok(tacheRepository.save(tache));
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','SUPPLY_CHAIN','ADMINISTRATEUR')")
     @PutMapping("/{id}/statut")
     public ResponseEntity<Tache> updateStatut(
             @PathVariable Long id, @RequestParam String statut) {
@@ -53,6 +56,7 @@ public class TacheController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','SUPPLY_CHAIN','ADMINISTRATEUR')")
     @PutMapping("/{id}")
     public ResponseEntity<Tache> update(@PathVariable Long id, @RequestBody Tache tache) {
         return tacheRepository.findById(id).map(existing -> {
@@ -75,6 +79,7 @@ public class TacheController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','SUPPLY_CHAIN','ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         tacheRepository.deleteById(id);

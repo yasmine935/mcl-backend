@@ -4,6 +4,7 @@ import com.monprojet.backend.model.PlanningNote;
 import com.monprojet.backend.repository.PlanningNoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -49,6 +50,7 @@ public class PlanningNoteController {
     }
 
     // POST ou PUT sauvegarder une note (upsert)
+    @PreAuthorize("hasAnyAuthority('TECHNICIEN_SUP','MANAGER','DIRECTION','SUPPLY_CHAIN','ADMINISTRATEUR')")
     @PostMapping("/sauvegarder")
     public ResponseEntity<PlanningNote> sauvegarder(@RequestBody PlanningNote planningNote) {
         // Si une note existe déjà pour cet utilisateur et cette date, on la met à jour
@@ -63,6 +65,7 @@ public class PlanningNoteController {
     }
 
     // DELETE
+    @PreAuthorize("hasAnyAuthority('TECHNICIEN_SUP','MANAGER','DIRECTION','SUPPLY_CHAIN','ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         planningNoteRepository.deleteById(id);

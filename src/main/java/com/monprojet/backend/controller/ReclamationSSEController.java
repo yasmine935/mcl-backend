@@ -4,6 +4,7 @@ import com.monprojet.backend.model.ReclamationSSE;
 import com.monprojet.backend.repository.ReclamationSSERepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,6 +53,7 @@ public class ReclamationSSEController {
     }
 
     // PUT changer statut (manager)
+    @PreAuthorize("hasAnyAuthority('TECHNICIEN_SUP','MANAGER','DIRECTION','RH','ADMINISTRATEUR')")
     @PutMapping("/{id}/statut")
     public ResponseEntity<ReclamationSSE> updateStatut(
             @PathVariable Long id, @RequestParam String statut) {
@@ -62,6 +64,7 @@ public class ReclamationSSEController {
     }
 
     // PUT remplir partie encadrement (manager)
+    @PreAuthorize("hasAnyAuthority('TECHNICIEN_SUP','MANAGER','DIRECTION','RH','ADMINISTRATEUR')")
     @PutMapping("/{id}/encadrement")
     public ResponseEntity<ReclamationSSE> updateEncadrement(
             @PathVariable Long id, @RequestBody ReclamationSSE data) {
@@ -76,6 +79,7 @@ public class ReclamationSSEController {
     }
 
     // DELETE
+    @PreAuthorize("hasAnyAuthority('TECHNICIEN_SUP','MANAGER','DIRECTION','RH','ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         reclamationRepository.deleteById(id);

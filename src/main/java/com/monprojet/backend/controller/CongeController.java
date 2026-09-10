@@ -4,21 +4,44 @@ import com.monprojet.backend.model.Conge;
 import com.monprojet.backend.repository.CongeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/conges")
 public class CongeController {
 
+    // Rôles habilités à gérer les congés de toute l'équipe (au-delà des siens)
+    private static final Set<String> ROLES_GESTION =
+            Set.of("RH", "DIRECTION", "TECHNICIEN_SUP", "MANAGER", "ADMINISTRATEUR");
+
     @Autowired
     private CongeRepository congeRepository;
+
+    /** Vrai si l'appelant a un rôle de gestion des congés. */
+    private boolean estGestion(Authentication auth) {
+        return auth != null && auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(ROLES_GESTION::contains);
+    }
+
+    /** Vrai si l'appelant est le propriétaire de la demande. */
+    private boolean estProprietaire(Conge conge, Principal principal) {
+        return principal != null
+                && conge.getUtilisateur() != null
+                && principal.getName().equals(conge.getUtilisateur().getUsername());
+    }
 
     // GET ALL
     @GetMapping
@@ -41,10 +64,14 @@ public class CongeController {
         return congeRepository.save(conge);
     }
 
-    // PUT (modification de la demande par son auteur)
+    // PUT (modification de la demande par son auteur, ou par la gestion)
     @PutMapping("/{id}")
-    public ResponseEntity<Conge> update(@PathVariable Long id, @RequestBody Conge congeModifie) {
+    public ResponseEntity<Conge> update(@PathVariable Long id, @RequestBody Conge congeModifie,
+                                        Principal principal, Authentication auth) {
         return congeRepository.findById(id).map(conge -> {
+            if (!estProprietaire(conge, principal) && !estGestion(auth)) {
+                return ResponseEntity.status(403).<Conge>build();
+            }
             conge.setDateDebut(congeModifie.getDateDebut());
             conge.setDateFin(congeModifie.getDateFin());
             conge.setType(congeModifie.getType());
@@ -55,7 +82,8 @@ public class CongeController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // PUT statut
+    // PUT statut : validation/refus — réservé à la gestion
+    @PreAuthorize("hasAnyAuthority('RH','DIRECTION','TECHNICIEN_SUP','MANAGER','ADMINISTRATEUR')")
     @PutMapping("/{id}/statut")
     public ResponseEntity<Conge> updateStatut(@PathVariable Long id,
                                               @RequestParam String statut,
@@ -72,14 +100,16 @@ public class CongeController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE
+    // DELETE : le propriétaire supprime SA demande, ou la gestion
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (congeRepository.existsById(id)) {
+    public ResponseEntity<Void> delete(@PathVariable Long id, Principal principal, Authentication auth) {
+        return congeRepository.findById(id).map(conge -> {
+            if (!estProprietaire(conge, principal) && !estGestion(auth)) {
+                return ResponseEntity.status(403).<Void>build();
+            }
             congeRepository.deleteById(id);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+            return ResponseEntity.ok().<Void>build();
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     // ✅ GET SOLDE CONGES

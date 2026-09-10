@@ -4,6 +4,7 @@ import com.monprojet.backend.model.Visiteur;
 import com.monprojet.backend.repository.VisiteurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,11 +21,13 @@ public class VisiteurController {
         return visiteurRepository.findAll();
     }
 
+    @PreAuthorize("hasAuthority('ADMINISTRATEUR')")
     @PostMapping
     public Visiteur create(@RequestBody Visiteur visiteur) {
         return visiteurRepository.save(visiteur);
     }
 
+    @PreAuthorize("hasAuthority('ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (visiteurRepository.existsById(id)) {

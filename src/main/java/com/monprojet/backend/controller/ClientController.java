@@ -4,6 +4,7 @@ import com.monprojet.backend.model.Client;
 import com.monprojet.backend.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -22,18 +23,21 @@ public class ClientController {
         return clientRepository.findAll();
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','DIRECTION','ADMINISTRATEUR')")
     @PostMapping
     public Client create(@RequestBody Client client) {
         client.setId(null);
         return clientRepository.save(client);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','DIRECTION','ADMINISTRATEUR')")
     @PutMapping("/{id}")
     public Client update(@PathVariable Long id, @RequestBody Client client) {
         client.setId(id);
         return clientRepository.save(client);
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','DIRECTION','ADMINISTRATEUR')")
     @PutMapping("/{id}/desactiver")
     public ResponseEntity<Client> desactiver(@PathVariable Long id,
                                              @RequestParam String desactivePar) {
@@ -47,6 +51,7 @@ public class ClientController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','DIRECTION','ADMINISTRATEUR')")
     @PutMapping("/{id}/reactiver")
     public ResponseEntity<Client> reactiver(@PathVariable Long id) {
         return clientRepository.findById(id).map(client -> {

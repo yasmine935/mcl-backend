@@ -4,6 +4,7 @@ import com.monprojet.backend.model.MinuteSecurite;
 import com.monprojet.backend.repository.MinuteSecuriteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -27,12 +28,14 @@ public class MinuteSecuriteController {
     }
 
     // POST - Technicien soumet
+    @PreAuthorize("hasAnyAuthority('TECHNICIEN','TECHNICIEN_SUP','ADMINISTRATEUR')")
     @PostMapping
     public MinuteSecurite create(@RequestBody MinuteSecurite minute) {
         return minuteSecuriteRepository.save(minute);
     }
 
     // PUT - Marquer comme lu
+    @PreAuthorize("hasAuthority('ADMINISTRATEUR')")
     @PutMapping("/{id}/lu")
     public ResponseEntity<MinuteSecurite> marquerLu(@PathVariable Long id) {
         return minuteSecuriteRepository.findById(id).map(m -> {
@@ -42,6 +45,7 @@ public class MinuteSecuriteController {
     }
 
     // DELETE
+    @PreAuthorize("hasAuthority('ADMINISTRATEUR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (minuteSecuriteRepository.existsById(id)) {
