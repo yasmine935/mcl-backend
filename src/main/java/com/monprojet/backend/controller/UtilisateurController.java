@@ -4,6 +4,7 @@ import com.monprojet.backend.model.Utilisateur;
 import com.monprojet.backend.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,6 +16,9 @@ public class UtilisateurController {
 
     @Autowired
     private UtilisateurRepository repo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // GET tous les employés
     @GetMapping
@@ -33,7 +37,10 @@ public class UtilisateurController {
     // POST créer un employé
     @PostMapping
     public Utilisateur creer(@RequestBody Utilisateur utilisateur) {
-        utilisateur.setPremierConnexion(true);  // ← ajoute cette ligne
+        utilisateur.setPremierConnexion(true);
+        if (utilisateur.getPassword() != null && !utilisateur.getPassword().isBlank()) {
+            utilisateur.setPassword(passwordEncoder.encode(utilisateur.getPassword()));
+        }
         return repo.save(utilisateur);
     }
     // PUT modifier un employé

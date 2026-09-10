@@ -15,7 +15,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/journal")
-@CrossOrigin(origins = "*")
 public class JournalTravailController {
 
     @Autowired

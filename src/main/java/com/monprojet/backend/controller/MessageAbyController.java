@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/messages-aby")
-@CrossOrigin(origins = "*")
 public class MessageAbyController {
 
     @Autowired

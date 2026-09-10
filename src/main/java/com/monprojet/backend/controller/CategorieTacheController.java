@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/categories-taches")
-@CrossOrigin(origins = "*")
 public class CategorieTacheController {
 
     @Autowired

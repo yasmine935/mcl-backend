@@ -1,5 +1,6 @@
 package com.monprojet.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -19,6 +20,8 @@ public class Utilisateur {
     private String departement;
     private LocalDate dateEmbauche;
     private String username;
+    // WRITE_ONLY : accepté en entrée (création, login) mais jamais renvoyé dans les réponses JSON
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private String role;
     private String statut;

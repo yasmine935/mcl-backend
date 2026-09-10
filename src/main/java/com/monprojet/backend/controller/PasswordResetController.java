@@ -4,8 +4,8 @@ import com.monprojet.backend.model.ResetPasswordRequest;
 import com.monprojet.backend.model.Utilisateur;
 import com.monprojet.backend.repository.ResetPasswordRequestRepository;
 import com.monprojet.backend.repository.UtilisateurRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -15,14 +15,19 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
 public class PasswordResetController {
 
-    @Autowired
-    private ResetPasswordRequestRepository resetRepo;
+    private final ResetPasswordRequestRepository resetRepo;
+    private final UtilisateurRepository utilisateurRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UtilisateurRepository utilisateurRepository;
+    public PasswordResetController(ResetPasswordRequestRepository resetRepo,
+                                   UtilisateurRepository utilisateurRepository,
+                                   PasswordEncoder passwordEncoder) {
+        this.resetRepo = resetRepo;
+        this.utilisateurRepository = utilisateurRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     // Demande mot de passe oublié
     @PostMapping("/forgot-password")
@@ -46,19 +51,28 @@ public class PasswordResetController {
         return resetRepo.findByStatut("EN_ATTENTE");
     }
 
-    // Admin réinitialise le mot de passe
+    // Admin réinitialise le mot de passe (temporaire : l'utilisateur devra le changer à la connexion)
+    // TODO sécurité : cet endpoint reste appelable sans authentification tant que la
+    // protection par token (phase JWT) n'est pas en place.
     @PutMapping("/reset-requests/{id}/reset")
     public ResponseEntity<?> resetPassword(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String newPassword = body.get("newPassword");
+        if (newPassword == null || newPassword.length() < 4) {
+            return ResponseEntity.badRequest().body("Mot de passe trop court");
+        }
         Optional<ResetPasswordRequest> optReq = resetRepo.findById(id);
         if (optReq.isEmpty()) return ResponseEntity.notFound().build();
 
         ResetPasswordRequest req = optReq.get();
+        if (!"EN_ATTENTE".equals(req.getStatut())) {
+            return ResponseEntity.badRequest().body("Demande déjà traitée");
+        }
         Optional<Utilisateur> optUser = utilisateurRepository.findByUsername(req.getUsername());
         if (optUser.isEmpty()) return ResponseEntity.notFound().build();
 
         Utilisateur u = optUser.get();
-        u.setPassword(newPassword);
+        u.setPassword(passwordEncoder.encode(newPassword));
+        u.setPremierConnexion(true);
         utilisateurRepository.save(u);
 
         req.setStatut("TRAITE");
@@ -67,17 +81,28 @@ public class PasswordResetController {
         return ResponseEntity.ok("Mot de passe réinitialisé");
     }
 
-    // Première connexion — changer son propre mot de passe
+    // Changer son propre mot de passe — exige le mot de passe actuel
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody Map<String, String> body) {
         String username = body.get("username");
+        String currentPassword = body.get("currentPassword");
         String newPassword = body.get("newPassword");
+
+        if (username == null || currentPassword == null
+                || newPassword == null || newPassword.length() < 4) {
+            return ResponseEntity.badRequest().body("Champs manquants ou mot de passe trop court");
+        }
 
         Optional<Utilisateur> opt = utilisateurRepository.findByUsername(username);
         if (opt.isEmpty()) return ResponseEntity.notFound().build();
 
         Utilisateur u = opt.get();
-        u.setPassword(newPassword);
+        if (u.getPassword() == null
+                || !passwordEncoder.matches(currentPassword, u.getPassword())) {
+            return ResponseEntity.status(401).body("Mot de passe actuel incorrect");
+        }
+
+        u.setPassword(passwordEncoder.encode(newPassword));
         u.setPremierConnexion(false);
         utilisateurRepository.save(u);
 
