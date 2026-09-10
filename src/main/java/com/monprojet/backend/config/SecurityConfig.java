@@ -40,8 +40,8 @@ public class SecurityConfig {
                 .requestMatchers("/error").permitAll()
                 // Authentification
                 .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/forgot-password").permitAll()
-                // Réservé à l'admin (rôle FERID tant que les rôles-prénoms ne sont pas refondus)
-                .requestMatchers("/api/auth/reset-requests/**").hasAuthority("FERID")
+                // Réservé à l'administrateur
+                .requestMatchers("/api/auth/reset-requests/**").hasAuthority("ADMINISTRATEUR")
                 // Écrans publics : accueil visiteurs et création de ticket
                 .requestMatchers(HttpMethod.GET, "/api/visiteurs").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/tickets").permitAll()

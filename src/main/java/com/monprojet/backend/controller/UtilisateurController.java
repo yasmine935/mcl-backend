@@ -35,9 +35,8 @@ public class UtilisateurController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST créer un employé — réservé à l'admin et aux RH
-    // (rôles-prénoms conservés jusqu'à la refonte en rôles fonctionnels)
-    @PreAuthorize("hasAnyAuthority('FERID', 'KARINE')")
+    // POST créer un employé — réservé à l'administrateur et aux RH
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATEUR', 'RH')")
     @PostMapping
     public Utilisateur creer(@RequestBody Utilisateur utilisateur) {
         utilisateur.setPremierConnexion(true);
@@ -46,9 +45,9 @@ public class UtilisateurController {
         }
         return repo.save(utilisateur);
     }
-    // PUT modifier un employé (dont le rôle) — réservé à l'admin et aux RH,
+    // PUT modifier un employé (dont le rôle) — réservé à l'administrateur et aux RH,
     // sinon n'importe quel compte pourrait s'attribuer le rôle admin
-    @PreAuthorize("hasAnyAuthority('FERID', 'KARINE')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATEUR', 'RH')")
     @PutMapping("/{id}")
     public ResponseEntity<Utilisateur> update(@PathVariable Long id, @RequestBody Utilisateur u) {
         return repo.findById(id).map(existing -> {
@@ -64,8 +63,8 @@ public class UtilisateurController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Désactiver un employé (soft delete) — réservé à l'admin et aux RH
-    @PreAuthorize("hasAnyAuthority('FERID', 'KARINE')")
+    // Désactiver un employé (soft delete) — réservé à l'administrateur et aux RH
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATEUR', 'RH')")
     @PutMapping("/{id}/desactiver")
     public ResponseEntity<Utilisateur> desactiver(@PathVariable Long id,
                                                   @RequestParam String desactivePar) {
@@ -79,8 +78,8 @@ public class UtilisateurController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Réactiver un employé — réservé à l'admin et aux RH
-    @PreAuthorize("hasAnyAuthority('FERID', 'KARINE')")
+    // Réactiver un employé — réservé à l'administrateur et aux RH
+    @PreAuthorize("hasAnyAuthority('ADMINISTRATEUR', 'RH')")
     @PutMapping("/{id}/reactiver")
     public ResponseEntity<Utilisateur> reactiver(@PathVariable Long id) {
         return repo.findById(id).map(u -> {

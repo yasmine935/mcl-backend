@@ -116,7 +116,7 @@ class SecuriteEndpointsTest {
     void lesRHPeuventCreerUnEmployeEtSonMotDePasseEstHache() throws Exception {
         when(utilisateurRepository.save(any(Utilisateur.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        mockMvc.perform(post("/api/utilisateurs").header("Authorization", jeton("KARINE"))
+        mockMvc.perform(post("/api/utilisateurs").header("Authorization", jeton("RH"))
                         .contentType("application/json")
                         .content("{\"username\":\"nouveau\",\"password\":\"secret123\",\"role\":\"TECHNICIEN\"}"))
                 .andExpect(status().isOk());
@@ -135,7 +135,7 @@ class SecuriteEndpointsTest {
                 .andExpect(status().isForbidden());
 
         when(resetRepo.findByStatut("EN_ATTENTE")).thenReturn(List.of());
-        mockMvc.perform(get("/api/auth/reset-requests").header("Authorization", jeton("FERID")))
+        mockMvc.perform(get("/api/auth/reset-requests").header("Authorization", jeton("ADMINISTRATEUR")))
                 .andExpect(status().isOk());
     }
 
