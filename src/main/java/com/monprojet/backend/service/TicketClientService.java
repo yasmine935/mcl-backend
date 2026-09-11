@@ -167,12 +167,20 @@ public class TicketClientService {
         return Resultat.ok(sauve);
     }
 
-    /** Transitions autorisées du cycle de vie. */
+    /**
+     * Transitions autorisées du cycle de vie.
+     * Depuis EN_ATTENTE_VALIDATION, le valideur choisit directement entre
+     * « Prendre en charge » (-> EN_COURS) ou « Rejeter » (-> REJETE) — l'étape
+     * intermédiaire VALIDE n'est plus utilisée par le flux de décision, mais
+     * reste acceptée en entrée de EN_COURS pour les tickets déjà validés avant
+     * ce changement (compatibilité arrière, base existante).
+     */
     private boolean transitionAutorisee(String actuel, String cible) {
         return switch (cible) {
             case TicketClient.VALIDE, TicketClient.REJETE ->
                     TicketClient.EN_ATTENTE_VALIDATION.equals(actuel) || TicketClient.NOUVEAU.equals(actuel);
-            case TicketClient.EN_COURS -> TicketClient.VALIDE.equals(actuel);
+            case TicketClient.EN_COURS ->
+                    TicketClient.VALIDE.equals(actuel) || TicketClient.EN_ATTENTE_VALIDATION.equals(actuel);
             case TicketClient.RESOLU -> TicketClient.EN_COURS.equals(actuel);
             case TicketClient.CLOTURE -> TicketClient.RESOLU.equals(actuel);
             default -> false;

@@ -74,8 +74,9 @@ public class TicketClientController {
     }
 
     @PutMapping("/{id}/prendre-en-charge")
-    public ResponseEntity<?> prendreEnCharge(@PathVariable Long id, Principal principal, Authentication auth) {
-        return traduire(service.decider(id, TicketClient.EN_COURS, null, principal.getName(), auth));
+    public ResponseEntity<?> prendreEnCharge(@PathVariable Long id, @RequestBody(required = false) DecisionRequest d,
+                                             Principal principal, Authentication auth) {
+        return traduire(service.decider(id, TicketClient.EN_COURS, commentaire(d), principal.getName(), auth));
     }
 
     @PutMapping("/{id}/resoudre")
