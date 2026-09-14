@@ -27,6 +27,7 @@ public class Ticket {
     private String typeMateriel;
     private String marque;
     private String reference;
+    private String numeroSerie;
     private Boolean sousGarantie;
     private String criticite;
 
@@ -79,6 +80,8 @@ public class Ticket {
     public void setMarque(String marque) { this.marque = marque; }
     public String getReference() { return reference; }
     public void setReference(String reference) { this.reference = reference; }
+    public String getNumeroSerie() { return numeroSerie; }
+    public void setNumeroSerie(String numeroSerie) { this.numeroSerie = numeroSerie; }
     public Boolean getSousGarantie() { return sousGarantie; }
     public void setSousGarantie(Boolean sousGarantie) { this.sousGarantie = sousGarantie; }
     public String getCriticite() { return criticite; }

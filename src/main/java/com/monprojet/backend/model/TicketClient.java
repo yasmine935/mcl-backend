@@ -27,13 +27,35 @@ public class TicketClient {
 
     private String numero;
     private String titre;
+    private String categorie;
+    private String statut = EN_ATTENTE_VALIDATION;
+
+    // ── Demande d'intervention (coordonnées du demandeur — peut différer du
+    // titulaire du compte client si plusieurs personnes partagent un même accès) ──
+    private String adresseSite;
+    private String nomDemandeur;
+    private String prenomDemandeur;
+    private String telephoneDemandeur;
+    private String emailDemandeur;
+
+    // ── Lieu d'intervention ──
+    private String lieuSite;
+    private String nomSalle;
+    private String etage;
 
     @Column(columnDefinition = "TEXT")
-    private String description;
+    private String informationsAdditionnelles;
 
-    private String categorie;
-    private String priorite;
-    private String statut = EN_ATTENTE_VALIDATION;
+    // ── Nature de la panne ──
+    private String typeMateriel;
+    private String marque;
+    private String reference;
+    private String numeroSerie;
+    private Boolean sousGarantie;
+    private String criticite;
+
+    @Column(columnDefinition = "TEXT")
+    private String descriptionPanne;
 
     private LocalDateTime dateCreation;
     private LocalDateTime dateMaj;
@@ -58,12 +80,40 @@ public class TicketClient {
     public void setNumero(String numero) { this.numero = numero; }
     public String getTitre() { return titre; }
     public void setTitre(String titre) { this.titre = titre; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
     public String getCategorie() { return categorie; }
     public void setCategorie(String categorie) { this.categorie = categorie; }
-    public String getPriorite() { return priorite; }
-    public void setPriorite(String priorite) { this.priorite = priorite; }
+    public String getAdresseSite() { return adresseSite; }
+    public void setAdresseSite(String adresseSite) { this.adresseSite = adresseSite; }
+    public String getNomDemandeur() { return nomDemandeur; }
+    public void setNomDemandeur(String nomDemandeur) { this.nomDemandeur = nomDemandeur; }
+    public String getPrenomDemandeur() { return prenomDemandeur; }
+    public void setPrenomDemandeur(String prenomDemandeur) { this.prenomDemandeur = prenomDemandeur; }
+    public String getTelephoneDemandeur() { return telephoneDemandeur; }
+    public void setTelephoneDemandeur(String telephoneDemandeur) { this.telephoneDemandeur = telephoneDemandeur; }
+    public String getEmailDemandeur() { return emailDemandeur; }
+    public void setEmailDemandeur(String emailDemandeur) { this.emailDemandeur = emailDemandeur; }
+    public String getLieuSite() { return lieuSite; }
+    public void setLieuSite(String lieuSite) { this.lieuSite = lieuSite; }
+    public String getNomSalle() { return nomSalle; }
+    public void setNomSalle(String nomSalle) { this.nomSalle = nomSalle; }
+    public String getEtage() { return etage; }
+    public void setEtage(String etage) { this.etage = etage; }
+    public String getInformationsAdditionnelles() { return informationsAdditionnelles; }
+    public void setInformationsAdditionnelles(String v) { this.informationsAdditionnelles = v; }
+    public String getTypeMateriel() { return typeMateriel; }
+    public void setTypeMateriel(String typeMateriel) { this.typeMateriel = typeMateriel; }
+    public String getMarque() { return marque; }
+    public void setMarque(String marque) { this.marque = marque; }
+    public String getReference() { return reference; }
+    public void setReference(String reference) { this.reference = reference; }
+    public String getNumeroSerie() { return numeroSerie; }
+    public void setNumeroSerie(String numeroSerie) { this.numeroSerie = numeroSerie; }
+    public Boolean getSousGarantie() { return sousGarantie; }
+    public void setSousGarantie(Boolean sousGarantie) { this.sousGarantie = sousGarantie; }
+    public String getCriticite() { return criticite; }
+    public void setCriticite(String criticite) { this.criticite = criticite; }
+    public String getDescriptionPanne() { return descriptionPanne; }
+    public void setDescriptionPanne(String descriptionPanne) { this.descriptionPanne = descriptionPanne; }
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
     public LocalDateTime getDateCreation() { return dateCreation; }
