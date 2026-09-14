@@ -72,7 +72,7 @@ public class DemoDataSeeder implements CommandLineRunner {
 
         // Quelques tickets client de démonstration, adressés aux valideurs (à prendre).
         if (dupont != null) {
-            creerTicket(dupont, "Imprimante en panne", "L'imprimante du 2e étage n'imprime plus.", "Matériel", "Haute");
+            creerTicket(dupont, "Imprimante en panne", "L'imprimante du 2e étage n'imprime plus.", "Matériel", "Importante");
             creerTicket(dupont, "Accès VPN", "Impossible de me connecter au VPN depuis lundi.", "Réseau", "Moyenne");
         }
 
@@ -80,15 +80,29 @@ public class DemoDataSeeder implements CommandLineRunner {
                 comptes.length, MOT_DE_PASSE);
     }
 
-    private void creerTicket(Utilisateur client, String titre, String description, String categorie, String priorite) {
+    private void creerTicket(Utilisateur client, String titre, String descriptionPanne, String categorie, String criticite) {
         TicketClient t = new TicketClient();
         t.setNumero("TC-" + String.format("%04d", ticketClientRepo.count() + 1));
         t.setTitre(titre);
-        t.setDescription(description);
         t.setCategorie(categorie);
-        t.setPriorite(priorite);
+        t.setCriticite(criticite);
         t.setStatut(TicketClient.EN_ATTENTE_VALIDATION);
         t.setClient(client);
+        // Demande d'intervention — dérivée du compte client pour la démo
+        // (en usage réel, la personne qui dépose n'est pas forcément le titulaire du compte).
+        t.setAdresseSite("Siège social");
+        t.setNomDemandeur(client.getNom());
+        t.setPrenomDemandeur(client.getPrenom());
+        t.setTelephoneDemandeur("0600000000");
+        t.setEmailDemandeur(client.getEmail());
+        // Lieu d'intervention
+        t.setLieuSite("Bâtiment principal");
+        t.setNomSalle("Accueil");
+        // Nature de la panne
+        t.setTypeMateriel(categorie);
+        t.setMarque("N/A");
+        t.setReference("N/A");
+        t.setDescriptionPanne(descriptionPanne);
         t.setDateCreation(LocalDateTime.now());
         t.setDateMaj(LocalDateTime.now());
         ticketClientRepo.save(t);
