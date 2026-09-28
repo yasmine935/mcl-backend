@@ -3,6 +3,11 @@ package com.monprojet.backend.controller;
 import com.monprojet.backend.model.Tache;
 import com.monprojet.backend.repository.TacheRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +24,45 @@ public class TacheController {
     @GetMapping
     public List<Tache> getAll() {
         return tacheRepository.findAll();
+    }
+
+    /**
+     * Liste paginée (écran "Gestion des Projets") : charge 20 projets à la fois
+     * au lieu de tout charger d'un coup (findAll() devenait lent, certains
+     * projets embarquent des fichiers en base64 dans "fichiers", potentiellement
+     * volumineux). Filtres optionnels appliqués côté base, pas en mémoire.
+     */
+    @GetMapping("/page")
+    public Page<Tache> getPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String statut,
+            @RequestParam(required = false) String priorite,
+            @RequestParam(required = false) String client,
+            @RequestParam(required = false) String recherche) {
+
+        Specification<Tache> spec = Specification.where(null);
+        if (statut != null && !statut.isBlank()) {
+            spec = spec.and((root, q, cb) -> cb.equal(root.get("statut"), statut));
+        }
+        if (priorite != null && !priorite.isBlank()) {
+            spec = spec.and((root, q, cb) -> cb.equal(root.get("priorite"), priorite));
+        }
+        if (client != null && !client.isBlank()) {
+            spec = spec.and((root, q, cb) -> cb.equal(root.get("client"), client));
+        }
+        if (recherche != null && !recherche.isBlank()) {
+            String like = "%" + recherche.toLowerCase() + "%";
+            spec = spec.and((root, q, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("titre")), like),
+                    cb.like(cb.lower(root.get("client")), like),
+                    cb.like(cb.lower(root.get("description")), like),
+                    cb.like(cb.lower(root.get("clientFinal")), like)
+            ));
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreation"));
+        return tacheRepository.findAll(spec, pageable);
     }
 
     @GetMapping("/utilisateur/{id}")
