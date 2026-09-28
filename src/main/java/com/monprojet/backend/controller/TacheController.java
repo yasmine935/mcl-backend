@@ -108,6 +108,7 @@ public class TacheController {
             existing.setDescription(tache.getDescription());
             existing.setPriorite(tache.getPriorite());
             existing.setStatut(tache.getStatut());
+            existing.setAvancement(tache.getAvancement());
             existing.setDateEcheance(tache.getDateEcheance());
             existing.setClient(tache.getClient());
             existing.setClientFinal(tache.getClientFinal());

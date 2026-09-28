@@ -19,6 +19,7 @@ public class Tache {
 
     private String priorite;
     private String statut;
+    private Integer avancement;
     private LocalDate dateEcheance;
     private LocalDateTime dateCreation;
 
@@ -52,6 +53,8 @@ public class Tache {
     public void setPriorite(String priorite) { this.priorite = priorite; }
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
+    public Integer getAvancement() { return avancement; }
+    public void setAvancement(Integer avancement) { this.avancement = avancement; }
     public LocalDate getDateEcheance() { return dateEcheance; }
     public void setDateEcheance(LocalDate dateEcheance) { this.dateEcheance = dateEcheance; }
     public LocalDateTime getDateCreation() { return dateCreation; }
