@@ -119,6 +119,8 @@ public class FicheInterventionController {
             fiche.setStatut("VALIDEE");
             if (data.get("approuvePar") != null) fiche.setApprouvePar((String) data.get("approuvePar"));
             if (data.get("dateApprobation") != null) fiche.setDateApprobation((String) data.get("dateApprobation"));
+            if (data.get("dateFacturation") != null) fiche.setDateFacturation((String) data.get("dateFacturation"));
+            if (data.get("numeroFacture") != null) fiche.setNumeroFacture((String) data.get("numeroFacture"));
             return ResponseEntity.ok(ficheRepository.save(fiche));
         }).orElse(ResponseEntity.notFound().build());
     }
