@@ -17,6 +17,7 @@ public record TacheResume(
         String priorite,
         String statut,
         Integer avancement,
+        String commentaire,
         LocalDate dateEcheance,
         LocalDateTime dateCreation,
         String client,

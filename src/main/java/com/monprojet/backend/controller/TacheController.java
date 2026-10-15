@@ -48,6 +48,17 @@ public class TacheController {
         return (root, q, cb) -> cb.equal(root.get("statut"), statut);
     }
 
+    /** Inverse de filtreStatut. Un statut NULL compte comme "Qualification" : il
+     * doit rester dans la liste quand on exclut un autre statut (un simple NOT IN
+     * l'écarterait, NULL NOT IN (...) n'étant jamais vrai en SQL). */
+    private static Specification<Tache> exclureStatut(String statut) {
+        Specification<Tache> exclusion = Specification.not(filtreStatut(statut));
+        if ("Qualification".equals(statut)) return exclusion;
+        return (root, q, cb) -> cb.or(
+                cb.isNull(root.get("statut")),
+                exclusion.toPredicate(root, q, cb));
+    }
+
     /** Toutes les listes renvoient des TacheResume (sans "fichiers") : la colonne
      * pèse des dizaines de Mo en prod. Seul GET /{id} renvoie le projet complet. */
     @GetMapping
@@ -68,11 +79,16 @@ public class TacheController {
             @RequestParam(required = false) String statut,
             @RequestParam(required = false) String priorite,
             @RequestParam(required = false) String client,
-            @RequestParam(required = false) String recherche) {
+            @RequestParam(required = false) String recherche,
+            // Ex. "Réalisé" : liste des projets non terminés (menu "Gestion des Projets" admin).
+            @RequestParam(required = false) String exclureStatut) {
 
         Specification<Tache> spec = Specification.where(null);
         if (statut != null && !statut.isBlank()) {
             spec = spec.and(filtreStatut(statut));
+        }
+        if (exclureStatut != null && !exclureStatut.isBlank()) {
+            spec = spec.and(exclureStatut(exclureStatut));
         }
         if (priorite != null && !priorite.isBlank()) {
             spec = spec.and((root, q, cb) -> cb.equal(root.get("priorite"), priorite));
@@ -140,6 +156,7 @@ public class TacheController {
             existing.setPriorite(tache.getPriorite());
             existing.setStatut(tache.getStatut());
             existing.setAvancement(tache.getAvancement());
+            existing.setCommentaire(tache.getCommentaire());
             existing.setDateEcheance(tache.getDateEcheance());
             existing.setClient(tache.getClient());
             existing.setClientFinal(tache.getClientFinal());

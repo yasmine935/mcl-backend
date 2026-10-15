@@ -46,6 +46,7 @@ public class TacheResumeRepositoryImpl implements TacheResumeRepository {
         cq.select(cb.construct(TacheResume.class,
                 root.get("id"), root.get("titre"), root.get("description"),
                 root.get("priorite"), root.get("statut"), root.get("avancement"),
+                root.get("commentaire"),
                 root.get("dateEcheance"), root.get("dateCreation"), root.get("client"),
                 root.get("clientFinal"), root.get("adresse"), root.get("chiffreAffaire"),
                 root.get("numDevis"), root.get("caDevis"), root.get("assignes"),

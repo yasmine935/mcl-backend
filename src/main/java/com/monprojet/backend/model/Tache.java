@@ -20,6 +20,9 @@ public class Tache {
     private String priorite;
     private String statut;
     private Integer avancement;
+
+    @Column(columnDefinition = "TEXT")
+    private String commentaire;
     private LocalDate dateEcheance;
     private LocalDateTime dateCreation;
 
@@ -55,6 +58,8 @@ public class Tache {
     public void setStatut(String statut) { this.statut = statut; }
     public Integer getAvancement() { return avancement; }
     public void setAvancement(Integer avancement) { this.avancement = avancement; }
+    public String getCommentaire() { return commentaire; }
+    public void setCommentaire(String commentaire) { this.commentaire = commentaire; }
     public LocalDate getDateEcheance() { return dateEcheance; }
     public void setDateEcheance(LocalDate dateEcheance) { this.dateEcheance = dateEcheance; }
     public LocalDateTime getDateCreation() { return dateCreation; }
