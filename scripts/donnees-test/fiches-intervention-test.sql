@@ -16,7 +16,7 @@ INSERT INTO fiches_intervention
    statut, description, taches, documents_importes,
    technicien_id, technicien_ids, technicien_noms, manager_id,
    confirme_par_kia, date_confirmation_kia, approuve_par, date_approbation,
-   date_facturation, numero_facture)
+   date_facturation, numero_facture, montant_facture)
 WITH RECURSIVE seq AS (
   SELECT 1 AS n UNION ALL SELECT n + 1 FROM seq WHERE n < 90
 ),
@@ -60,7 +60,8 @@ SELECT
   IF(age > 60, 'Demo Aurelien', NULL),
   IF(age > 60, DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL age - 3 DAY), '%Y-%m-%dT10:00:00'), NULL),
   IF(age > 60, DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL age - 3 DAY), '%Y-%m-%d'), NULL),
-  IF(age > 60, CONCAT('FAC-TEST-', LPAD(n, 4, '0')), NULL)
+  IF(age > 60, CONCAT('FAC-TEST-', LPAD(n, 4, '0')), NULL),
+  IF(age > 60, CAST(250 + (n * 137) % 1750 AS CHAR), NULL)
 FROM base;
 
 -- Contrôle : nombre de fiches de test par mois

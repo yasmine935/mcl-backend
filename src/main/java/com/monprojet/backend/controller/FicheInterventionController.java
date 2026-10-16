@@ -1,5 +1,6 @@
 package com.monprojet.backend.controller;
 
+import com.monprojet.backend.dto.FactureFiche;
 import com.monprojet.backend.model.FicheIntervention;
 import com.monprojet.backend.model.Utilisateur;
 import com.monprojet.backend.repository.FicheInterventionRepository;
@@ -20,6 +21,12 @@ public class FicheInterventionController {
 
     @GetMapping
     public List<FicheIntervention> getAll() { return ficheRepository.findAll(); }
+
+    /** Factures des fiches d'un projet (détail du projet : tableau + reste à facturer). */
+    @GetMapping("/factures")
+    public List<FactureFiche> getFacturesProjet(@RequestParam String numProjet) {
+        return ficheRepository.findFacturesByNumProjet(numProjet);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<FicheIntervention> getById(@PathVariable Long id) {
@@ -50,6 +57,9 @@ public class FicheInterventionController {
             fiche.setAdresse(updated.getAdresse());
             fiche.setContact(updated.getContact());
             fiche.setDateIntervention(updated.getDateIntervention());
+            fiche.setDateFin(updated.getDateFin());
+            // Absent de la requête = non géré par l'appelant : on garde la valeur en base
+            if (updated.getMaterielsHorsStandard() != null) fiche.setMaterielsHorsStandard(updated.getMaterielsHorsStandard());
             fiche.setDescription(updated.getDescription());
             fiche.setTaches(updated.getTaches());
             fiche.setDocumentsImportes(updated.getDocumentsImportes());
@@ -65,6 +75,11 @@ public class FicheInterventionController {
             fiche.setTechnicienNoms(updated.getTechnicienNoms());
             fiche.setNomContactSite(updated.getNomContactSite());
             fiche.setTelContactSite(updated.getTelContactSite());
+            // Rubrique Facturation (les factures importées sont dans documentsImportes, type "Facture")
+            fiche.setNumeroFacture(updated.getNumeroFacture());
+            fiche.setDateFacturation(updated.getDateFacturation());
+            fiche.setMontantFacture(updated.getMontantFacture());
+            fiche.setRefSage(updated.getRefSage());
             return ResponseEntity.ok(ficheRepository.save(fiche));
         }).orElse(ResponseEntity.notFound().build());
     }

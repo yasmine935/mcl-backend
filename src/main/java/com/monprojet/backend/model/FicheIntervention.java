@@ -31,6 +31,8 @@ public class FicheIntervention {
     private String telContactSite;
     private String dateFacturation;
     private String numeroFacture;
+    private String montantFacture;
+    private String refSage;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -93,6 +95,10 @@ public class FicheIntervention {
     public void setDateFacturation(String dateFacturation) { this.dateFacturation = dateFacturation; }
     public String getNumeroFacture() { return numeroFacture; }
     public void setNumeroFacture(String numeroFacture) { this.numeroFacture = numeroFacture; }
+    public String getMontantFacture() { return montantFacture; }
+    public void setMontantFacture(String montantFacture) { this.montantFacture = montantFacture; }
+    public String getRefSage() { return refSage; }
+    public void setRefSage(String refSage) { this.refSage = refSage; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNumProjet() { return numProjet; }

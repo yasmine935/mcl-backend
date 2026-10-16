@@ -162,6 +162,7 @@ public class TacheController {
             existing.setClientFinal(tache.getClientFinal());
             existing.setAdresse(tache.getAdresse());
             existing.setChiffreAffaire(tache.getChiffreAffaire());
+            existing.setNumCommandeClient(tache.getNumCommandeClient());
             existing.setNumDevis(tache.getNumDevis());
             existing.setCaDevis(tache.getCaDevis());
             existing.setAssignes(tache.getAssignes());

@@ -24,6 +24,7 @@ public record TacheResume(
         String clientFinal,
         String adresse,
         String chiffreAffaire,
+        String numCommandeClient,
         String numDevis,
         String caDevis,
         String assignes,

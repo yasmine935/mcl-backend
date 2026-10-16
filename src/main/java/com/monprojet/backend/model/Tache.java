@@ -30,6 +30,7 @@ public class Tache {
     private String clientFinal;
     private String adresse;
     private String chiffreAffaire;
+    private String numCommandeClient;
     private String numDevis;
     private String caDevis;
 
@@ -72,6 +73,8 @@ public class Tache {
     public void setAdresse(String adresse) { this.adresse = adresse; }
     public String getChiffreAffaire() { return chiffreAffaire; }
     public void setChiffreAffaire(String chiffreAffaire) { this.chiffreAffaire = chiffreAffaire; }
+    public String getNumCommandeClient() { return numCommandeClient; }
+    public void setNumCommandeClient(String numCommandeClient) { this.numCommandeClient = numCommandeClient; }
     public String getNumDevis() { return numDevis; }
     public void setNumDevis(String numDevis) { this.numDevis = numDevis; }
     public String getCaDevis() { return caDevis; }
