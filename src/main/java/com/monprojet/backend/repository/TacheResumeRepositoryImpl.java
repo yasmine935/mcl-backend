@@ -50,7 +50,7 @@ public class TacheResumeRepositoryImpl implements TacheResumeRepository {
                 root.get("dateEcheance"), root.get("dateCreation"), root.get("client"),
                 root.get("clientFinal"), root.get("adresse"), root.get("chiffreAffaire"),
                 root.get("numCommandeClient"), root.get("numDevis"), root.get("caDevis"), root.get("assignes"),
-                root.get("etapes"), utilisateur));
+                root.get("etapes"), root.get("historiqueStatut"), utilisateur));
         Predicate filtre = spec == null ? null : spec.toPredicate(root, cq, cb);
         if (filtre != null) cq.where(filtre);
         if (sort != null && sort.isSorted()) cq.orderBy(QueryUtils.toOrders(sort, root, cb));

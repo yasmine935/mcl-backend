@@ -3,6 +3,7 @@ package com.monprojet.backend.controller;
 import com.monprojet.backend.dto.TacheResume;
 import com.monprojet.backend.model.Tache;
 import com.monprojet.backend.repository.TacheRepository;
+import com.monprojet.backend.service.ProjetEtapesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,9 @@ public class TacheController {
 
     @Autowired
     private TacheRepository tacheRepository;
+
+    @Autowired
+    private ProjetEtapesService projetEtapesService;
 
     /** Valeurs en base rattachées à chaque statut affiché — miroir de
      * ANCIENS_STATUTS côté front (services/statuts-projet.ts). Les anciens codes restent en base
@@ -134,6 +138,9 @@ public class TacheController {
     public ResponseEntity<Tache> create(@RequestBody Tache tache) {
         tache.setStatut("Qualification");
         tache.setDateCreation(LocalDateTime.now());
+        tache.setEtapes(null);              // étapes et historique : gérés par le serveur
+        tache.setHistoriqueStatut(null);
+        projetEtapesService.appliquerChangementStatut(tache, null);
         return ResponseEntity.ok(tacheRepository.save(tache));
     }
 
@@ -142,7 +149,9 @@ public class TacheController {
     public ResponseEntity<Tache> updateStatut(
             @PathVariable Long id, @RequestParam String statut) {
         return tacheRepository.findById(id).map(tache -> {
+            String ancienStatut = tache.getStatut();
             tache.setStatut(statut);
+            projetEtapesService.appliquerChangementStatut(tache, ancienStatut);
             return ResponseEntity.ok(tacheRepository.save(tache));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -151,6 +160,7 @@ public class TacheController {
     @PutMapping("/{id}")
     public ResponseEntity<Tache> update(@PathVariable Long id, @RequestBody Tache tache) {
         return tacheRepository.findById(id).map(existing -> {
+            String ancienStatut = existing.getStatut();
             existing.setTitre(tache.getTitre());
             existing.setDescription(tache.getDescription());
             existing.setPriorite(tache.getPriorite());
@@ -166,7 +176,8 @@ public class TacheController {
             existing.setNumDevis(tache.getNumDevis());
             existing.setCaDevis(tache.getCaDevis());
             existing.setAssignes(tache.getAssignes());
-            existing.setEtapes(tache.getEtapes());
+            // Étapes : plus reprises de la requête — elles suivent le statut (ProjetEtapesService)
+            projetEtapesService.appliquerChangementStatut(existing, ancienStatut);
             // Absent de la requête = pièces jointes non chargées côté front (listes
             // sans "fichiers") : on garde celles en base au lieu de les effacer.
             if (tache.getFichiers() != null) existing.setFichiers(tache.getFichiers());

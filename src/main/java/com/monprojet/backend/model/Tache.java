@@ -40,6 +40,10 @@ public class Tache {
     @Column(columnDefinition = "TEXT")
     private String etapes;
 
+    /** JSON [{ancien, statut, at, par}] — tenu par le serveur (ProjetEtapesService). */
+    @Column(columnDefinition = "TEXT")
+    private String historiqueStatut;
+
     @Column(columnDefinition = "LONGTEXT")
     private String fichiers;
 
@@ -83,6 +87,8 @@ public class Tache {
     public void setAssignes(String assignes) { this.assignes = assignes; }
     public String getEtapes() { return etapes; }
     public void setEtapes(String etapes) { this.etapes = etapes; }
+    public String getHistoriqueStatut() { return historiqueStatut; }
+    public void setHistoriqueStatut(String historiqueStatut) { this.historiqueStatut = historiqueStatut; }
     public String getFichiers() { return fichiers; }
     public void setFichiers(String fichiers) { this.fichiers = fichiers; }
     public Utilisateur getUtilisateur() { return utilisateur; }

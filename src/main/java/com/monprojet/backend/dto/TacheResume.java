@@ -29,5 +29,6 @@ public record TacheResume(
         String caDevis,
         String assignes,
         String etapes,
+        String historiqueStatut,
         Utilisateur utilisateur) {
 }
