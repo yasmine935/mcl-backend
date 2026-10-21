@@ -2,6 +2,7 @@ package com.monprojet.backend.controller;
 
 import com.monprojet.backend.dto.TacheResume;
 import com.monprojet.backend.model.Tache;
+import com.monprojet.backend.repository.FicheInterventionRepository;
 import com.monprojet.backend.repository.TacheRepository;
 import com.monprojet.backend.service.ProjetEtapesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class TacheController {
 
     @Autowired
     private ProjetEtapesService projetEtapesService;
+
+    @Autowired
+    private FicheInterventionRepository ficheRepository;
 
     /** Valeurs en base rattachées à chaque statut affiché — miroir de
      * ANCIENS_STATUTS côté front (services/statuts-projet.ts). Les anciens codes restent en base
@@ -182,7 +186,10 @@ public class TacheController {
             // sans "fichiers") : on garde celles en base au lieu de les effacer.
             if (tache.getFichiers() != null) existing.setFichiers(tache.getFichiers());
             if (tache.getUtilisateur() != null) existing.setUtilisateur(tache.getUtilisateur());
-            return ResponseEntity.ok(tacheRepository.save(existing));
+            Tache enregistre = tacheRepository.save(existing);
+            // Les fiches liées affichent le titre du projet : on le garde à jour s'il a changé.
+            ficheRepository.renommerProjet(enregistre.getId(), enregistre.getTitre());
+            return ResponseEntity.ok(enregistre);
         }).orElse(ResponseEntity.notFound().build());
     }
 

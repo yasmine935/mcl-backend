@@ -13,6 +13,12 @@ public class FicheIntervention {
     private Long id;
 
     private String numProjet;
+
+    /** Projet (table taches) de la fiche. numProjet n'est plus que son libellé affiché,
+     * recopié depuis le titre du projet. Simple id (pas de @ManyToOne) : un projet
+     * embarque ses pièces jointes en base64, à ne jamais charger avec les fiches. */
+    @Column(name = "projet_id")
+    private Long projetId;
     private String client;
     private String adresse;
     private String contact;
@@ -101,6 +107,8 @@ public class FicheIntervention {
     public void setRefSage(String refSage) { this.refSage = refSage; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    public Long getProjetId() { return projetId; }
+    public void setProjetId(Long projetId) { this.projetId = projetId; }
     public String getNumProjet() { return numProjet; }
     public void setNumProjet(String numProjet) { this.numProjet = numProjet; }
     public String getClient() { return client; }

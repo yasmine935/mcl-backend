@@ -2,8 +2,10 @@ package com.monprojet.backend.controller;
 
 import com.monprojet.backend.dto.FactureFiche;
 import com.monprojet.backend.model.FicheIntervention;
+import com.monprojet.backend.model.Tache;
 import com.monprojet.backend.model.Utilisateur;
 import com.monprojet.backend.repository.FicheInterventionRepository;
+import com.monprojet.backend.repository.TacheRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/fiches-intervention")
@@ -19,13 +22,24 @@ public class FicheInterventionController {
     @Autowired
     private FicheInterventionRepository ficheRepository;
 
+    @Autowired
+    private TacheRepository tacheRepository;
+
+    /** Une fiche doit appartenir à un projet réel (plus de saisie libre du nom). */
+    private static final String PROJET_OBLIGATOIRE = "Choisissez un projet existant pour cette fiche d'intervention.";
+
+    /** Projet référencé par la fiche reçue, s'il existe. */
+    private Optional<Tache> projetDe(FicheIntervention fiche) {
+        return fiche.getProjetId() == null ? Optional.empty() : tacheRepository.findById(fiche.getProjetId());
+    }
+
     @GetMapping
     public List<FicheIntervention> getAll() { return ficheRepository.findAll(); }
 
     /** Factures des fiches d'un projet (détail du projet : tableau + reste à facturer). */
     @GetMapping("/factures")
-    public List<FactureFiche> getFacturesProjet(@RequestParam String numProjet) {
-        return ficheRepository.findFacturesByNumProjet(numProjet);
+    public List<FactureFiche> getFacturesProjet(@RequestParam Long projetId) {
+        return ficheRepository.findFacturesByProjetId(projetId);
     }
 
     @GetMapping("/{id}")
@@ -44,15 +58,21 @@ public class FicheInterventionController {
 
     @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','DIRECTION','ADMINISTRATEUR')")
     @PostMapping
-    public FicheIntervention create(@RequestBody FicheIntervention fiche) {
-        return ficheRepository.save(fiche);
+    public ResponseEntity<?> create(@RequestBody FicheIntervention fiche) {
+        Optional<Tache> projet = projetDe(fiche);
+        if (projet.isEmpty()) return ResponseEntity.badRequest().body(Map.of("message", PROJET_OBLIGATOIRE));
+        fiche.setNumProjet(projet.get().getTitre());   // libellé = titre du projet, pas le texte reçu
+        return ResponseEntity.ok(ficheRepository.save(fiche));
     }
 
     @PreAuthorize("hasAnyAuthority('MANAGER','TECHNICIEN_SUP','DIRECTION','ADMINISTRATEUR')")
     @PutMapping("/{id}")
-    public ResponseEntity<FicheIntervention> update(@PathVariable Long id, @RequestBody FicheIntervention updated) {
-        return ficheRepository.findById(id).map(fiche -> {
-            fiche.setNumProjet(updated.getNumProjet());
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody FicheIntervention updated) {
+        Optional<Tache> projet = projetDe(updated);
+        if (projet.isEmpty()) return ResponseEntity.badRequest().body(Map.of("message", PROJET_OBLIGATOIRE));
+        return ficheRepository.findById(id).<ResponseEntity<?>>map(fiche -> {
+            fiche.setProjetId(projet.get().getId());
+            fiche.setNumProjet(projet.get().getTitre());
             fiche.setClient(updated.getClient());
             fiche.setAdresse(updated.getAdresse());
             fiche.setContact(updated.getContact());
